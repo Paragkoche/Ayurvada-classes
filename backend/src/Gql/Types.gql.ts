@@ -6,6 +6,15 @@ export const user = new gql.GraphQLObjectType({
     id: {
       type: gql.GraphQLID,
     },
+    pay: {
+      type: gql.GraphQLString,
+    },
+    pay_by: {
+      type: gql.GraphQLString,
+    },
+    is_pay: {
+      type: gql.GraphQLBoolean,
+    },
     name: {
       type: gql.GraphQLString,
     },
@@ -108,15 +117,7 @@ export const classes = new gql.GraphQLObjectType({
     name: {
       type: gql.GraphQLString,
     },
-    pay: {
-      type: gql.GraphQLString,
-    },
-    pay_by: {
-      type: gql.GraphQLString,
-    },
-    is_pay: {
-      type: gql.GraphQLBoolean,
-    },
+
     end_date: {
       type: gql.GraphQLString,
     },

@@ -5,7 +5,15 @@ import gql from "./Gql/index.gql";
 import * as Cookie from "cookie-parser";
 import { createHandler } from "graphql-http/lib/use/express";
 import DB from "./DB";
+import * as cors from "cors";
 const app = express();
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 app.use(Cookie());
 app.all("/gql", (request: Request, response: Response, nex: NextFunction) =>
   createHandler({

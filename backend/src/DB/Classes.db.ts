@@ -6,6 +6,7 @@ import {
   JoinTable,
   ManyToOne,
   OneToMany,
+  JoinColumn,
 } from "typeorm";
 import { User } from "./User.db";
 import { Video } from "./Video.db";
@@ -29,11 +30,11 @@ export class Classes {
     type: "date",
   })
   createAt: Date;
-  @ManyToMany(() => User)
-  @JoinTable()
-  accessBy: User[];
   @ManyToOne(() => User, (uu) => uu.classes)
   makeBy: User;
+  @ManyToMany(() => User)
+  @JoinTable()
+  access_by: User[];
   @OneToMany(() => Video, (v) => v.id)
   Videos: Video[];
 }

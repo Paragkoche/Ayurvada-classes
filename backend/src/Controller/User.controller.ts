@@ -4,7 +4,6 @@ import { User } from "../DB/User.db";
 import { decode } from "../Util/JWT.token";
 import { compare } from "bcrypt";
 import { password_key } from "../Env";
-import { Db } from "typeorm";
 export const getUser = (token: string) => {
   const id = decode(token).id;
   return DB.getRepository(User).findOneBy({
@@ -101,7 +100,7 @@ export const make_client = async (data: User) => {
       ...data,
       gender: data.gender,
       is_active: true,
-      role: "teacher",
+      role: "client",
     })
   );
 };
