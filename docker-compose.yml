@@ -13,24 +13,4 @@ services:
     # volumes:
     #   - postgres-data:/var/lib/postgresql/data
     restart: unless-stopped
-  client:
-    build:
-      context: ./client
-    volumes:
-      - staticbuild:/app/out
- 
-  nginx:
-    build:
-      context: ./nginx
-    volumes:
-      - staticbuild:/app/public
-    ports:
-      - “8080:80”
- 
-  networks:
-    dev:
-      driver: bridge
- 
-  volumes:
-    staticbuild:
     
