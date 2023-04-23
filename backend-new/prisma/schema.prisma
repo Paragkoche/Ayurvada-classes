@@ -1,0 +1,90 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String    @id @default(uuid())
+  name           String
+  email          String    @unique
+  password       String
+  age            String
+  gender         gender
+  role           role
+  is_active      Boolean
+  isPayfor       Classes[] @relation("payment")
+  createdClasses Classes[] @relation("makeby")
+  video          video?    @relation(fields: [videoId], references: [id])
+  videoId        String?
+  Like           Like[]
+  comment        comment[]
+}
+
+enum role {
+  admin
+  teacher
+  client
+}
+
+enum gender {
+  male
+  female
+  other
+}
+
+model Classes {
+  id       String   @id @default(uuid())
+  photo    String
+  name     String
+  pay      String
+  endOn    String
+  crateAt  DateTime @default(now())
+  lecher   video[]
+  PayUser  User[]   @relation("payment")
+  makeby   User?    @relation("makeby", fields: [makebyID], references: [id])
+  makebyID String?
+}
+
+model Like {
+  id      String  @id @default(uuid())
+  likeBy  User    @relation(fields: [userId], references: [id])
+  video   video?  @relation(fields: [videoId], references: [id])
+  videoId String?
+  userId  String
+}
+
+model comment {
+  id                     String    @id @default(uuid())
+  comment                String
+  by                     User      @relation(fields: [userId], references: [id])
+  comment_of_comment     comment[] @relation("cocr")
+  video                  video?    @relation(fields: [videoId], references: [id])
+  videoId                String?
+  userId                 String
+  comment_of_comment_rel comment?  @relation("cocr", fields: [commentId], references: [id])
+  commentId              String?
+}
+
+model video {
+  id         String    @id @default(uuid())
+  title      String
+  photo      String
+  disc       String
+  link       String?
+  isZoomMeet Boolean
+  isLiveNow  Boolean
+  is48h      DateTime
+  createAt   DateTime  @default(now())
+  viewby     User[]
+  like       Like[]
+  comment    comment[]
+  Classes    Classes?  @relation(fields: [classesId], references: [id])
+  classesId  String?
+}

@@ -1,6 +1,7 @@
-import { ApolloClient, InMemoryCache } from "@apollo/client";
+import { ApolloClient, InMemoryCache, gql } from "@apollo/client";
+export const URL = "http://localhost:8085";
 export const client = new ApolloClient({
-  uri: "http://localhost:8080/gql",
+  uri: URL + "/gql",
   cache: new InMemoryCache(),
   credentials: "include",
 });

@@ -53,7 +53,7 @@ export default () => {
                   >
                     <Grid item sx={{ mb: 3 }}>
                       <Link href={"/"}>
-                        <h1>Ayurveda</h1>
+                        <h1>Tanwish Institute</h1>
                       </Link>
                     </Grid>
                     <Grid item xs={12}>

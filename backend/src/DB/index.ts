@@ -7,7 +7,7 @@ import { Video } from "./Video.db";
 
 export default new DataSource({
   type: "postgres",
-  host: "localhost",
+  host: "128.199.25.83",
   password: "postgres",
   database: "YoGa",
   synchronize: true,

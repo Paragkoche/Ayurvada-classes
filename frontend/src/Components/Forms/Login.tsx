@@ -31,38 +31,19 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import AnimateButton from "../extr/AnimateButton";
 import { gql, useMutation } from "@apollo/client";
 import { useRouter } from "next/router";
-const useScriptRef = () => {
-  const scripted = useRef(true);
-
-  useEffect(
-    () => () => {
-      scripted.current = false;
-    },
-    []
-  );
-
-  return scripted;
-};
-
-// ============================|| FIREBASE - LOGIN ||============================ //
+import Link from "next/link";
 
 const FirebaseLogin = ({ ...others }) => {
   const router = useRouter();
   const theme: any = useTheme();
-  const scriptedRef = useScriptRef();
   const matchDownSM = useMediaQuery(theme.breakpoints.down("md"));
   const [checked, setChecked] = useState(true);
   const [Login_client, { data, loading, error }] = useMutation(gql`
-    mutation Login_client($password: String, $email: String) {
-      Login_client(password: $password, email: $email) {
+    mutation login($password: String, $email: String) {
+      login(password: $password, email: $email) {
         id
-        pay
-        pay_by
-        is_pay
         name
-        profile_pic
         email
-        constantNo
         age
         gender
         role
@@ -130,12 +111,28 @@ const FirebaseLogin = ({ ...others }) => {
           try {
             await Login_client({
               variables: values,
-            }).then(() => {
-              localStorage.setItem("user", JSON.stringify(data.Login_client));
-              router.push("/users");
+            }).then((e) => {
+              // console.log(e);
+              if (e.errors) {
+                setStatus({ success: false });
+                setErrors({ submit: error?.message });
+                setSubmitting(false);
+              }
+              if (e.data) {
+                console.log(e.data.login.role);
+
+                if (e.data.login.role == "Client") {
+                  router.push("/users");
+                } else {
+                  router.push("/admin");
+                }
+              }
+              localStorage.setItem("role", e.data.login.role);
+              localStorage.setItem("user", JSON.stringify(e.data.login));
             });
 
-            setStatus({ success: true });
+            // setStatus({ success: true });
+
             setSubmitting(false);
           } catch (err: any) {
             setStatus({ success: false });
@@ -240,6 +237,8 @@ const FirebaseLogin = ({ ...others }) => {
                 label="Remember me"
               />
               <Typography
+                component={Link}
+                href={"/forgotPassword"}
                 variant="subtitle1"
                 color="secondary"
                 sx={{ textDecoration: "none", cursor: "pointer" }}

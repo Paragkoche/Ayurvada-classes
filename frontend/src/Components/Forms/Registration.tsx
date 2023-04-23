@@ -13,6 +13,7 @@ import {
   IconButton,
   InputAdornment,
   InputLabel,
+  MenuItem,
   OutlinedInput,
   Select,
   Stack,
@@ -37,31 +38,23 @@ const FirebaseLogin = ({ ...others }) => {
   const matchDownSM = useMediaQuery(theme.breakpoints.down("md"));
   const [checked, setChecked] = useState(true);
   const [add_Client, { data, loading, error }] = useMutation(gql`
-    mutation Add_client(
+    mutation make_client(
       $name: String
       $password: String
       $email: String
-      $contantNo: String
-      $age: Int
-      $gander: String
+      $age: String
+      $gander: User_Gander
     ) {
-      Add_client(
+      make_client(
         name: $name
-        profile_pic: ""
         password: $password
         email: $email
-        constantNo: $contantNo
         age: $age
         gender: $gander
       ) {
         id
-        pay
-        pay_by
-        is_pay
         name
-        profile_pic
         email
-        constantNo
         age
         gender
         role
@@ -118,7 +111,7 @@ const FirebaseLogin = ({ ...others }) => {
           name: "XYZ",
           password: "...",
           contantNo: "+91 80XXXXXXX0",
-          age: "8",
+          age: "8".toString(),
           gander: "Male",
           submit: null,
         }}
@@ -134,16 +127,17 @@ const FirebaseLogin = ({ ...others }) => {
 
           try {
             await add_Client({
-              variables: { ...values, age: parseInt(values.age) },
-            }).then(() => {
-              localStorage.setItem("user", JSON.stringify(data.Add_client));
-              router.push("/user");
+              variables: { ...values },
+            }).then((e) => {
+              console.log(e);
+
+              localStorage.setItem("user", JSON.stringify(e.data.Login_client));
+              router.push("/users");
             });
             setStatus({ success: true });
-
             setSubmitting(false);
           } catch (err: any) {
-            console.log(error?.message);
+            console.log(error);
 
             setStatus({ success: false });
             setErrors({ submit: error?.message });
@@ -255,30 +249,7 @@ const FirebaseLogin = ({ ...others }) => {
                 </FormHelperText>
               )}
             </FormControl>
-            <FormControl
-              fullWidth
-              error={Boolean(touched.contantNo && errors.contantNo)}
-              sx={{ ...theme.typography.customInput }}
-            >
-              <InputLabel htmlFor="outlined-adornment-cc-login">
-                Phone Number
-              </InputLabel>
-              <OutlinedInput
-                id="outlined-adornment-cc-login"
-                type="text"
-                value={values.contantNo}
-                name="contantNo"
-                onBlur={handleBlur}
-                onChange={handleChange}
-                label="Contact No"
-                inputProps={{}}
-              />
-              {touched.contantNo && errors.contantNo && (
-                <FormHelperText error id="standard-weight-helper-text-cc-login">
-                  {errors.contantNo}
-                </FormHelperText>
-              )}
-            </FormControl>
+
             <Stack
               direction="row"
               alignItems="center"
@@ -319,16 +290,11 @@ const FirebaseLogin = ({ ...others }) => {
                 <InputLabel htmlFor="outlined-adornment-age-login">
                   Gander
                 </InputLabel>
-                <OutlinedInput
-                  id="outlined-adornment-age-login"
-                  type="text"
-                  value={values.gander}
-                  name="gander"
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  label="Gander"
-                  inputProps={{}}
-                ></OutlinedInput>
+                <Select>
+                  <MenuItem value={"Male"}>Male</MenuItem>
+                  <MenuItem value={"Female"}>Female</MenuItem>
+                  <MenuItem value={"Other"}>Other</MenuItem>
+                </Select>
                 {touched.gander && errors.gander && (
                   <FormHelperText
                     error
@@ -339,7 +305,7 @@ const FirebaseLogin = ({ ...others }) => {
                 )}
               </FormControl>
             </Stack>
-            <FormControl
+            {/* <FormControl
               fullWidth
               error={Boolean(touched.contantNo && errors.contantNo)}
               sx={{ ...theme.typography.customInput }}
@@ -362,7 +328,7 @@ const FirebaseLogin = ({ ...others }) => {
                   {errors.contantNo}
                 </FormHelperText>
               )}
-            </FormControl>
+            </FormControl> */}
             <Stack
               direction="row"
               alignItems="center"

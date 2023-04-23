@@ -1,16 +1,47 @@
-version: '3.9'
+version: '3.8'
 services:
-  postgres:
-    image: postgres:latest
-    container_name: postgres
-    hostname: postgres
-    ports:
-      - 5432:5432
+  db:
+    image: postgres:14.1-alpine
+    restart: always
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: YoGa
-    # volumes:
-    #   - postgres-data:/var/lib/postgresql/data
-    restart: unless-stopped
-    
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - '5432:5432'
+    volumes: 
+      - db:/var/lib/postgresql/data
+    networks:
+      - mynetwork
+  api:
+    container_name: API
+    restart: always
+    build: 
+      context: backend-new/
+      dockerfile: Dockerfile
+    command: /bin/bash -c "npm i && npm i ts-node -g && npm i nodemon -g && npm run dev"
+    working_dir: /backend
+    ports:
+      - 2053:2053
+    volumes:
+      - ./backend-new:/backend
+    networks:
+      - mynetwork
+  nextjs:
+    container_name: nextjs
+    build: 
+      context: frontend
+      dockerfile: Dockerfile
+    command: /bin/bash -c "npm run build && npm run start"
+    volumes:
+      - ./frontend:/frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - api
+      - db
+networks:
+  mynetwork:
+    driver: bridge
+volumes:
+  db:
+    driver: local
