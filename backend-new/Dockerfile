@@ -1,4 +1,4 @@
-From node
+FROM node
 WORKDIR /backend
 COPY . .
 # RUN rm -r ./node_modules

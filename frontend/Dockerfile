@@ -1,4 +1,4 @@
-From node
+FROM node
 WORKDIR /fronend
 COPY . .
 RUN npm i 
