@@ -42,9 +42,9 @@ app.use("/gql", (req, res, next) =>
 const storage = multer.diskStorage({
   destination: "./video/",
   filename: (req, file, cb) => {
-    console.log(req.params);
+    // console.log(req.params);
 
-    console.log(req.params.id);
+    // console.log(req.params.id);
 
     cb(null, req.params.id + ".mp4");
   },
@@ -116,7 +116,7 @@ app.post(
   multer({ storage }).single("file"),
   async (req, res) => {
     const { filename }: any = req.file;
-    console.log(req.params.id);
+    // console.log(req.params.id);
 
     const id: any = decode(req.cookies.token);
     if (!id) return res.send({ error: "your not found" });
@@ -125,17 +125,17 @@ app.post(
         id: id.id,
       },
     });
-    console.log(user);
+    // console.log(user);
 
     if (!user) return res.send({ error: { message: "login first" } });
     if (user.role == "client")
       return res.send({ error: { message: "your not admin" } });
     const video = await DB.video.findUnique({ where: { id: req.params.id } });
-    console.log(video, "ok");
+    // console.log(video, "ok");
 
     if (!video) return res.send("video not found");
 
-    console.log(req.params);
+    // console.log(req.params);
 
     const videoUpdate = await DB.video.update({
       where: { id: video.id },
@@ -176,7 +176,7 @@ app.put("/log-out", (req, res) => {
   res.clearCookie("token").send("OK");
 });
 app.put("/forgot", async (req, res) => {
-  console.log(req.body);
+  // console.log(req.body);
 
   const { email } = req.body;
   const user = await DB.user.findUnique({

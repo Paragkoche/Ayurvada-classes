@@ -190,9 +190,13 @@ const update = () => {
                                 ...fromData.get_client_id,
                                 id: route.query.id,
                               },
-                            }).finally(() => {
-                              refetch();
-                            });
+                            })
+                              .then(() => {
+                                route.push("/admin/users");
+                              })
+                              .finally(() => {
+                                refetch();
+                              });
                           }}
                         >
                           <FormControl

@@ -10,6 +10,26 @@ interface ctx {
 export default new gql.GraphQLObjectType({
   name: "Query",
   fields: () => ({
+    get_classes_id: {
+      type: types.Classes,
+      args: {
+        id: {
+          type: gql.GraphQLID,
+        },
+      },
+      resolve: async (_, __, ctx: ctx) => {
+        const user: any = decode(ctx.req.cookies.token);
+        if (!user) return Error("first login");
+        const classes = await DB.classes.findUnique({
+          where: {
+            id: __.id,
+          },
+        });
+
+        return classes;
+      },
+    },
+
     get_classes_by_id: {
       type: types.Classes,
       args: {
@@ -95,7 +115,7 @@ export default new gql.GraphQLObjectType({
         });
         if (!R_user) return Error("first login");
         if (R_user.role != "client") return Error("your not client");
-        console.log(R_user);
+        // console.log(R_user);
 
         return R_user.isPayfor;
       },
@@ -192,7 +212,7 @@ export default new gql.GraphQLObjectType({
         const users = await DB.user.findUnique({ where: { id: user.id } });
         if (!users) return Error("first login");
         if (users.role == "client") return Error("your not admin");
-        console.log(__);
+        // console.log(__);
 
         const userss = await DB.user.findMany({
           where: {
@@ -251,7 +271,7 @@ export default new gql.GraphQLObjectType({
             },
           },
         });
-        console.log(user);
+        // console.log(user);
 
         if (user.length == 0) return new Error("video not for you");
         const a = await DB.video.findUnique({

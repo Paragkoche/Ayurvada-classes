@@ -33,7 +33,7 @@ export default new gql.GraphQLObjectType({
             ...ags,
           },
         });
-        console.log(ctx.req.cookies.token);
+        // console.log(ctx.req.cookies.token);
 
         if (!ctx.req.cookies.token)
           ctx.res.cookie("token", encode({ id: user.id }));
@@ -156,7 +156,7 @@ export default new gql.GraphQLObjectType({
             id: id.id,
           },
         });
-        console.log(user);
+        // console.log(user);
 
         if (!user) return Error("first login");
         if (user.role == "client") return Error("your client");
@@ -165,7 +165,7 @@ export default new gql.GraphQLObjectType({
             id: ags.classID,
           },
         });
-        console.log(classes);
+        // console.log(classes);
         ags.classID = undefined;
         if (!classes) return Error("Classes Not found");
         const time = new Date(Date.now());
@@ -318,8 +318,13 @@ export default new gql.GraphQLObjectType({
         password: { type: gql.GraphQLString },
       },
       resolve: async (_, ags, ctx: ctx) => {
-        if (ags.password !== "") ags.password = await pass_encode(ags.password);
-        else ags.password = undefined;
+        // console.log(ags);
+
+        if (ags.password !== "" && ags.password)
+          ags.password = await pass_encode(ags.password);
+
+        // console.log(ags);
+
         const user = await DB.user.update({
           where: {
             id: ags.id,
@@ -332,7 +337,7 @@ export default new gql.GraphQLObjectType({
             ...ags,
           },
         });
-        console.log(ctx.req.cookies.token);
+        // console.log(ctx.req.cookies.token);
 
         if (!ctx.req.cookies.token)
           ctx.res.cookie("token", encode({ id: user.id }));
@@ -361,7 +366,7 @@ export default new gql.GraphQLObjectType({
           },
         });
         if (!video) return new Error("video not delete");
-        console.log("." + video.link);
+        // console.log("." + video.link);
 
         fs.unlink("." + video.link || "", (err) => {
           if (err) new Error(err.message);
@@ -404,7 +409,7 @@ export default new gql.GraphQLObjectType({
       },
     },
     delete_classes: {
-      type: types.video,
+      type: types.Classes,
       args: {
         id: { type: gql.GraphQLID },
       },
@@ -426,20 +431,40 @@ export default new gql.GraphQLObjectType({
       },
     },
     update_classes: {
-      type: types.video,
+      type: types.Classes,
       args: {
         id: { type: gql.GraphQLID },
+        photo: {
+          type: gql.GraphQLString,
+        },
+        name: {
+          type: gql.GraphQLString,
+        },
+        pay: {
+          type: gql.GraphQLString,
+        },
+        endOn: {
+          type: gql.GraphQLString,
+        },
       },
       resolve: async (_, ags, ctx: ctx) => {
         const id: any = decode(ctx.req.cookies.token);
-
-        if (!id) return new Error("Login first");
-        const admin = await DB.user.findUnique({
+        const user = await DB.user.findUnique({
           where: {
             id: id.id,
           },
         });
-        if (admin?.role !== "admin") return new Error("Your not admin");
+        if (!user) return Error("first login");
+        if (user.role == "client") return Error("your client");
+        return DB.classes.update({
+          where: {
+            id: ags.id,
+          },
+          data: {
+            endOn: new Date(ags.endOn).toString(),
+            ...ags,
+          },
+        });
       },
     },
   }),
