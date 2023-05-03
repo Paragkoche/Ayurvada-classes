@@ -222,7 +222,9 @@ export default () => {
             <Button
               color="error"
               onClick={() => {
-                if (d == "Delete") {
+                console.log(D);
+
+                if (D == "Delete") {
                   deleteStudent({
                     variables: {
                       id: seleteName.id,

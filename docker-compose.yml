@@ -18,7 +18,7 @@ services:
     build: 
       context: backend-new/
       dockerfile: Dockerfile
-    command: /bin/bash -c "rm -r ./node_modules/;npm i && npm i ts-node -g && npm i nodemon -g && npm run dev"
+    command: /bin/bash -c "rm -r ./node_modules/;npx prisma db push;npm i && npm i ts-node -g && npm i nodemon -g && npm run dev"
     working_dir: /backend
     ports:
       - 2053:2053
