@@ -16,32 +16,8 @@ import "plyr-react/plyr.css";
 import { useRef } from "react";
 import { CardContent } from "@mui/joy";
 import { URL } from "@/api";
-// import MuiPlayer from "mui-player";
-// import {  } from "@mui/joy";
 
-// const useStyles = makeStyles((theme: any) => ({
-//   container: {
-//     display: "flex",
-//     flexDirection: "column",
-//     alignItems: "center",
-//     marginTop: theme.spacing(2),
-//     marginBottom: theme.spacing(2),
-//   },
-//   video: {
-//     width: "100%",
-//     maxWidth: "800px",
-//     height: "auto",
-//   },
-//   title: {
-//     fontWeight: "bold",
-//     marginBottom: theme.spacing(1),
-//   },
-//   description: {
-//     marginBottom: theme.spacing(2),
-//   },
-// }));
-
-export default () => {
+const Page = () => {
   const router = useRouter();
   const ref = useRef<APITypes>(null);
   const { videoID } = router.query;
@@ -65,7 +41,7 @@ export default () => {
     }
   );
   return (
-    <Layout>
+    <>
       {loading || !data ? (
         <CircularProgress />
       ) : (
@@ -101,17 +77,17 @@ export default () => {
                       {
                         src: URL + data.get_video.link,
                         provider: "html5",
-                        // provider:""
                       },
                     ],
                   }}
-                  // image={data.get_video.photo} //  photo
                 />
               )}
             </CardContent>
           </Card>
         </Container>
       )}
-    </Layout>
+    </>
   );
 };
+Page.getLayout = (page: any) => <Layout>{page}</Layout>;
+export default Page;
