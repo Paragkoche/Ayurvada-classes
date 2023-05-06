@@ -78,7 +78,7 @@ const update = () => {
     !loading &&
     data &&
     fromData && (
-      <Layout>
+      <>
         <AuthWrapper1>
           <Grid
             container
@@ -332,7 +332,7 @@ const update = () => {
             </Grid>
           </Grid>
         </AuthWrapper1>
-      </Layout>
+      </>
     )
   );
 };
@@ -347,4 +347,6 @@ const update = () => {
 //   });
 //   return { data };
 // };
+update.getLayout = (page: any) => <Layout>{page}</Layout>;
+
 export default update;

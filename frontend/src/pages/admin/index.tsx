@@ -5,9 +5,9 @@ import React from "react";
 import Classes from "@/Components/Admin/components/classes";
 import Teachers from "@/Components/Admin/components/teachers";
 
-export default () => {
+const Page = () => {
   return (
-    <Layout>
+    <>
       <Grid container spacing={3}>
         <Grid item xs={12}>
           <Grid container spacing={3}>
@@ -25,6 +25,8 @@ export default () => {
           </Grid>
         </Grid>
       </Grid>
-    </Layout>
+    </>
   );
 };
+Page.getLayout = (page: any) => <Layout>{page}</Layout>;
+export default Page;

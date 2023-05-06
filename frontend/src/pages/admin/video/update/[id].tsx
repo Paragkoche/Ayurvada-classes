@@ -29,7 +29,7 @@ const AuthWrapper1 = styled("div")(({ theme }) => ({
   backgroundColor: theme.palette.primary.light,
   minHeight: "60vh",
 }));
-const update = () => {
+const Page = () => {
   const theme: any = useTheme();
   const matchDownSM = useMediaQuery(theme.breakpoints.down("md"));
   const route = useRouter();
@@ -66,7 +66,7 @@ const update = () => {
     !loading &&
     data &&
     fromData && (
-      <Layout>
+      <>
         <AuthWrapper1>
           <Grid
             container
@@ -262,7 +262,7 @@ const update = () => {
             </Grid>
           </Grid>
         </AuthWrapper1>
-      </Layout>
+      </>
     )
   );
 };
@@ -277,4 +277,5 @@ const update = () => {
 //   });
 //   return { data };
 // };
-export default update;
+Page.getLayout = (page: any) => <Layout>{page}</Layout>;
+export default Page;

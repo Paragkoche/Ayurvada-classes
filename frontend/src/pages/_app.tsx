@@ -5,7 +5,8 @@ import { CssBaseline, StyledEngineProvider } from "@mui/material";
 import { ApolloProvider } from "@apollo/client";
 import themes from "../theme";
 import { client } from "../api";
-export default function App({ Component, pageProps }: AppProps) {
+export default function App({ Component, pageProps }: AppProps | any) {
+  const getLayout = Component.getLayout ?? ((page: any) => page);
   return (
     <ApolloProvider client={client}>
       <StyledEngineProvider>
@@ -19,7 +20,7 @@ export default function App({ Component, pageProps }: AppProps) {
           })}
         >
           <CssBaseline />
-          <Component {...pageProps} />
+          {getLayout(<Component {...pageProps} />)}
         </ThemeProvider>
       </StyledEngineProvider>
     </ApolloProvider>

@@ -20,7 +20,7 @@ import FileUpload from "react-mui-fileuploader";
 import AnimateButton from "@/Components/extr/AnimateButton";
 import { URL } from "@/api";
 
-export default () => {
+const Page = () => {
   const theme: any = useTheme();
   const [video, setVideo] = React.useState<any>();
   const [data, setData] = React.useState({
@@ -69,7 +69,7 @@ export default () => {
     }
   `);
   return (
-    <Layout>
+    <>
       <MainCard title="Add Video or Zoom meet Link">
         <Box px={20} py={3}>
           <form
@@ -231,6 +231,8 @@ export default () => {
           </form>
         </Box>
       </MainCard>
-    </Layout>
+    </>
   );
 };
+Page.getLayout = (page: any) => <Layout>{page}</Layout>;
+export default Page;

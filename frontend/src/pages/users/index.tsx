@@ -17,7 +17,7 @@ import Layout from "./Layout";
 import MainCard from "@/Components/MainCard";
 import AnimateButton from "@/Components/extr/AnimateButton";
 import { useRouter } from "next/router";
-export default () => {
+const Page = () => {
   const router = useRouter();
   const theme = useTheme();
   const { loading, data, error } = useQuery(gql`
@@ -37,7 +37,7 @@ export default () => {
   `);
 
   return (
-    <Layout>
+    <>
       {error ? (
         <Snackbar open autoHideDuration={5000} message={error.message} />
       ) : null}
@@ -129,6 +129,8 @@ export default () => {
           </MainCard>
         </>
       )}
-    </Layout>
+    </>
   );
 };
+Page.getLayout = (page: any) => <Layout>{page}</Layout>;
+export default Page;

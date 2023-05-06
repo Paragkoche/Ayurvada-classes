@@ -27,7 +27,7 @@ import { useRouter } from "next/router";
 import { URL } from "@/api";
 import React from "react";
 
-export default () => {
+const Page = () => {
   const theme = useTheme();
   const router = useRouter();
   const { loading, data, error, refetch } = useQuery(gql`
@@ -65,7 +65,7 @@ export default () => {
   return (
     !loading &&
     data && (
-      <Layout>
+      <>
         <MainCard
           secondary={
             <IconButton
@@ -277,7 +277,10 @@ export default () => {
             <Button onClick={() => setDd(!dd)}>No</Button>
           </DialogActions>
         </Dialog>
-      </Layout>
+      </>
     )
   );
 };
+
+Page.getLayout = (page: any) => <Layout>{page}</Layout>;
+export default Page;

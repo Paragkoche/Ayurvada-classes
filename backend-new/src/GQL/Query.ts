@@ -327,5 +327,46 @@ export default new gql.GraphQLObjectType({
         return DB.video.findMany({});
       },
     },
+    access_to_class: {
+      type: new gql.GraphQLObjectType({
+        name: "Access_Class",
+        fields: () => ({
+          user_name: {
+            type: gql.GraphQLString,
+          },
+          classes: {
+            type: new gql.GraphQLList(types.Classes),
+          },
+        }),
+      }),
+      args: {
+        userId: {
+          type: gql.GraphQLString,
+        },
+        classes: {
+          type: new gql.GraphQLList(gql.GraphQLString),
+        },
+      },
+      resolve: async (_, ags, ctx) => {
+        const user: any = decode(ctx.req.cookies.token);
+        if (!user) return Error("first login");
+        const users = await DB.user.findUnique({ where: { id: user.id } });
+        if (!users) return Error("first login");
+        if (users.role == "client") return Error("your not admin");
+        const client = await DB.user.findUnique({ where: { id: ags.userId } });
+        if (!client) return Error("user not found");
+        return DB.user.update({
+          where: {
+            id: client.id,
+          },
+          data: {
+            isPayfor: {
+              connect: [...ags.classes],
+            },
+          },
+          // create: undefined
+        });
+      },
+    },
   }), //only admin make the request
 });

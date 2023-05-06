@@ -51,10 +51,6 @@ const storage = multer.diskStorage({
 });
 //just chacke user is pressent or not
 app.get("/video/:id", async (req, res) => {
-  // const id: any = decode(req.cookies.token);
-  // const user = await DB.user.findUnique({ where: { id: id.id } });
-  // if (!user) return res.send({ error: { message: "login first" } });
-  // if (user.role !== "client") {
   let video: any = await DB.video.findUnique({
     where: { id: req.params.id.split(".")[0] },
   });
@@ -65,8 +61,10 @@ app.get("/video/:id", async (req, res) => {
   }
   const videoSize = fs.statSync(videoPath).size;
   const CHUNK_SIZE = 10 ** 6;
-  const start = Number(range?.replace(/\D/g, ""));
-  const end = Math.min(start + CHUNK_SIZE, videoSize - 1);
+  const start = Number(
+    range?.replace(/\D/g, "") || "bytes=0-".replace(/\D/g, "")
+  );
+  const end = Math.min(start + CHUNK_SIZE, videoSize - 1) || 0;
   const contentLength = end - start + 1;
   const headers = {
     "Content-Range": `bytes ${start}-${end}/${videoSize}`,
@@ -77,43 +75,12 @@ app.get("/video/:id", async (req, res) => {
   res.writeHead(206, headers);
   const videoStream = fs.createReadStream(videoPath, { start, end });
   videoStream.pipe(res);
-  // } else {
-  // let video = await DB.video.findUnique({
-  //   where: { id: req.params.id.split(".")[0] },
-  // });
-  // if (!video) return res.json({ error: { message: "video not fount 404" } });
-  // // if (
-  // //   video.is48h.getMonth() == new Date().getMonth() &&
-  // //   video.is48h.getDate() < new Date().getDate()
-  // // )
-  // //   return res.json({ error: { message: "video not fount 404" } });
-  // // if (video.is48h)
-  // //   return res.json({ error: { message: "video not fount 404" } });
-  // // if (video.isLiveNow) return res.json({ video: { link: video.link } });
-  // const videoPath = "./video/" + video.link;
-  // const range = req.headers.range || "bytes=0-";
-  // if (!range) {
-  //   res.status(400).send("Requires Range header");
-  // }
-  // const videoSize = fs.statSync(videoPath).size;
-  // const CHUNK_SIZE = 10 ** 6;
-  // const start = Number(range?.replace(/\D/g, ""));
-  // const end = Math.min(start + CHUNK_SIZE, videoSize - 1);
-  // const contentLength = end - start + 1;
-  // const headers = {
-  //   "Content-Range": `bytes ${start}-${end}/${videoSize}`,
-  //   "Accept-Ranges": "bytes",
-  //   "Content-Length": contentLength,
-  //   "Content-Type": "video/mp4",
-  // };
-  // res.writeHead(206, headers);
-  // const videoStream = fs.createReadStream(videoPath, { start, end });
-  // videoStream.pipe(res);
-  // }
 });
 app.post(
   "/upload/video/:id",
-  multer({ storage }).single("file"),
+  multer({ storage, limits: { fileSize: 1000000 * 1024 * 1024 } }).single(
+    "file"
+  ),
   async (req, res) => {
     const { filename }: any = req.file;
     // console.log(req.params.id);

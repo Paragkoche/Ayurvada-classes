@@ -21,7 +21,7 @@ const FL = styled(FileUpload)(({ theme }) => ({
   color: theme.palette.background.paper,
 }));
 
-export default () => {
+const Page = () => {
   const [data, setData] = React.useState({
     photo: "",
     pay: "",
@@ -43,7 +43,7 @@ export default () => {
   const [isSubmitting, setisSubmitting] = React.useState(false);
   const theme: any = useTheme();
   return (
-    <Layout>
+    <>
       <MainCard>
         <Box px={20} py={3}>
           <Formik
@@ -144,6 +144,8 @@ export default () => {
           </Formik>
         </Box>
       </MainCard>
-    </Layout>
+    </>
   );
 };
+Page.getLayout = (page: any) => <Layout>{page}</Layout>;
+export default Page;

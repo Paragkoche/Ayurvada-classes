@@ -19,7 +19,7 @@ import { useTheme } from "@mui/material";
 import { IconButton } from "@mui/material";
 import { useRouter } from "next/router";
 
-export default () => {
+const Page = () => {
   const theme = useTheme();
   const router = useRouter();
   const { loading, data, error } = useQuery(gql`
@@ -38,11 +38,13 @@ export default () => {
   return (
     !loading &&
     data && (
-      <Layout>
+      <>
         <MainCard title="All Teachers" content={true}>
           <Typography>Coming Soon</Typography>
         </MainCard>
-      </Layout>
+      </>
     )
   );
 };
+Page.getLayout = (page: any) => <Layout>{page}</Layout>;
+export default Page;

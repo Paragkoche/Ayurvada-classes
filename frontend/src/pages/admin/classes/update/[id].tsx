@@ -21,7 +21,7 @@ const FL = styled(FileUpload)(({ theme }) => ({
   color: theme.palette.background.paper,
 }));
 
-export default () => {
+const Page = () => {
   const router = useRouter();
   const { id } = router.query;
   const {
@@ -67,7 +67,7 @@ export default () => {
     !lo &&
     dd &&
     data && (
-      <Layout>
+      <>
         <MainCard>
           <Box px={20} py={3}>
             <Formik
@@ -200,7 +200,9 @@ export default () => {
             </Formik>
           </Box>
         </MainCard>
-      </Layout>
+      </>
     )
   );
 };
+Page.getLayout = (page: any) => <Layout>{page}</Layout>;
+export default Page;

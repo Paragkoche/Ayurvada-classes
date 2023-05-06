@@ -37,7 +37,7 @@ import { IconButton } from "@mui/material";
 import { useRouter } from "next/router";
 import React from "react";
 
-export default () => {
+const Page = () => {
   const theme = useTheme();
   const router = useRouter();
   const [dialog, setDialog] = React.useState(false);
@@ -70,7 +70,7 @@ export default () => {
   return (
     !loading &&
     data && (
-      <Layout>
+      <>
         <MainCard
           secondary={
             <>
@@ -243,7 +243,9 @@ export default () => {
             <Button onClick={() => setDialog((s) => !s)}>No</Button>
           </DialogActions>
         </Dialog>
-      </Layout>
+      </>
     )
   );
 };
+Page.getLayout = (page: any) => <Layout>{page}</Layout>;
+export default Page;

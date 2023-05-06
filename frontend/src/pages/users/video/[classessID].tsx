@@ -13,7 +13,7 @@ import { gql, useQuery } from "@apollo/client";
 import { useRouter } from "next/router";
 import MainCard from "@/Components/MainCard";
 
-export default () => {
+const Page = () => {
   const router = useRouter();
   const { classessID } = router.query;
   const { loading, data, error } = useQuery(
@@ -35,7 +35,7 @@ export default () => {
     }
   );
   return (
-    <Layout>
+    <>
       {loading && !data ? (
         <CircularProgress />
       ) : (
@@ -63,6 +63,8 @@ export default () => {
           </Box>
         </MainCard>
       )}
-    </Layout>
+    </>
   );
 };
+Page.getLayout = (page: any) => <Layout>{page}</Layout>;
+export default Page;

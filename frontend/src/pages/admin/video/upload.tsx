@@ -7,7 +7,7 @@ import {
   TextField,
   Button,
 } from "@mui/material";
-export default () => {
+const Page = () => {
   const handleSubmit = (event: any) => {
     event.preventDefault();
   };
@@ -84,3 +84,5 @@ export default () => {
     </Layout>
   );
 };
+Page.getLayout = (page: any) => <Layout>{page}</Layout>;
+export default Page;

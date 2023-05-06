@@ -14,7 +14,7 @@ import { useTheme } from "@emotion/react";
 import React from "react";
 import { gql, useMutation, useQuery } from "@apollo/client";
 
-export default () => {
+const Page = () => {
   const theme: any = useTheme();
   const [studentId, setStudentId] = React.useState("");
   const [dis, setDis] = React.useState(false);
@@ -26,7 +26,7 @@ export default () => {
     }
   `);
   return (
-    <Layout>
+    <>
       <MainCard title="Delete Student">
         <Box px={20} py={3}>
           <form
@@ -78,6 +78,8 @@ export default () => {
           </form>
         </Box>
       </MainCard>
-    </Layout>
+    </>
   );
 };
+Page.getLayout = (page: any) => <Layout>{page}</Layout>;
+export default Page;

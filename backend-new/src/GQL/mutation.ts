@@ -169,7 +169,7 @@ export default new gql.GraphQLObjectType({
         ags.classID = undefined;
         if (!classes) return Error("Classes Not found");
         const time = new Date(Date.now());
-        const next48 = time.setDate(time.getDate() + 2);
+        const next48 = time.setDate(time.getDate() + 3);
         const video = await DB.video.create({
           data: {
             is48h: new Date(next48),
