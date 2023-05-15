@@ -5,6 +5,7 @@ import DB from "../DB";
 import { decode, encode } from "../Util/jwt";
 import fs from "fs";
 import { decode as pass_decode, encode as pass_encode } from "../Util/Password";
+import GQL from ".";
 interface ctx {
   req: Request;
   res: Response;
@@ -316,6 +317,9 @@ export default new gql.GraphQLObjectType({
         age: { type: gql.GraphQLString },
         gender: { type: types.Gender_Enum },
         password: { type: gql.GraphQLString },
+        isPayfor: {
+          type: new gql.GraphQLList(types.class_id),
+        },
       },
       resolve: async (_, ags, ctx: ctx) => {
         // console.log(ags);
@@ -334,7 +338,10 @@ export default new gql.GraphQLObjectType({
 
             is_active: true,
             role: "client",
-            ...ags,
+            isPayfor: {
+              set: ags.isPayfor,
+            },
+            // ...ags,
           },
         });
         // console.log(ctx.req.cookies.token);

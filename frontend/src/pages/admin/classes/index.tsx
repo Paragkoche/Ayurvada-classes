@@ -13,6 +13,7 @@ import {
   TableCell,
   TableContainer,
   TableHead,
+  TablePagination,
   TableRow,
 } from "@mui/material";
 import { Table } from "@mui/material";
@@ -24,7 +25,13 @@ import { useTheme } from "@mui/material";
 import { IconButton } from "@mui/material";
 import { useRouter } from "next/router";
 import React from "react";
-
+export function applyPagination(
+  documents: any,
+  page: number,
+  rowsPerPage: number
+) {
+  return documents.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+}
 const Page = () => {
   const theme = useTheme();
   const router = useRouter();
@@ -57,6 +64,22 @@ const Page = () => {
   }, []);
   const [D, setD] = React.useState("");
   const [dd, setDd] = React.useState(false);
+  const [page, setPage] = React.useState(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  React.useEffect(() => {
+    return setData(
+      applyPagination(data?.get_all_classes || [], page, rowsPerPage)
+    );
+  }, [page, rowsPerPage, data]);
+  const handlePageChange = React.useCallback((event: any, value: any) => {
+    setPage(value);
+  }, []);
+  const [_data, setData] = React.useState(
+    applyPagination(data?.get_all_classes || [], page, rowsPerPage)
+  );
+  const handleRowsPerPageChange = React.useCallback((event: any) => {
+    setRowsPerPage(event.target.value);
+  }, []);
   return (
     !loading &&
     data && (
@@ -136,7 +159,7 @@ const Page = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {data.get_all_classes.map((v: any) => (
+                {_data.map((v: any) => (
                   <TableRow>
                     <TableCell>
                       <Typography
@@ -205,6 +228,15 @@ const Page = () => {
               </TableBody>
             </Table>
           </TableContainer>
+          <TablePagination
+            component="div"
+            count={data.get_all_classes.length}
+            onPageChange={handlePageChange}
+            onRowsPerPageChange={handleRowsPerPageChange}
+            page={page}
+            rowsPerPage={rowsPerPage}
+            rowsPerPageOptions={[5, 10, 25]}
+          />
         </MainCard>
         <Dialog open={dd}>
           <DialogTitle>Do you want to {D} this Classes?</DialogTitle>

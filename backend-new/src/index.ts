@@ -11,8 +11,10 @@ import { decode } from "jsonwebtoken";
 import { Stripe } from "stripe";
 import { pay_key } from "./Util/env";
 import { getData, setCache } from "./Util/cache";
+import { randomUUID } from "crypto";
 import { encode as PasswordE } from "./Util/Password";
 const app = express();
+app.use("/video", express.static("./video"));
 app.use(
   express.json({
     limit: "1tb",
@@ -46,41 +48,12 @@ const storage = multer.diskStorage({
 
     // console.log(req.params.id);
 
-    cb(null, req.params.id + ".mp4");
+    cb(null, `${randomUUID()}.${file.originalname.split(".").at(-1)}`);
   },
 });
-//just chacke user is pressent or not
-app.get("/video/:id", async (req, res) => {
-  let video: any = await DB.video.findUnique({
-    where: { id: req.params.id.split(".")[0] },
-  });
-  const videoPath = "./" + video.link;
-  const range = req.headers.range || "bytes=0-";
-  if (!range) {
-    return res.status(400).send("Requires Range header");
-  }
-  const videoSize = fs.statSync(videoPath).size;
-  const CHUNK_SIZE = 10 ** 6;
-  const start = Number(
-    range?.replace(/\D/g, "") || "bytes=0-".replace(/\D/g, "")
-  );
-  const end = Math.min(start + CHUNK_SIZE, videoSize - 1) || 0;
-  const contentLength = end - start + 1;
-  const headers = {
-    "Content-Range": `bytes ${start}-${end}/${videoSize}`,
-    "Accept-Ranges": "bytes",
-    "Content-Length": contentLength,
-    "Content-Type": "video/mp4",
-  };
-  res.writeHead(206, headers);
-  const videoStream = fs.createReadStream(videoPath, { start, end });
-  videoStream.pipe(res);
-});
 app.post(
-  "/upload/video/:id",
-  multer({ storage, limits: { fileSize: 1000000 * 1024 * 1024 } }).single(
-    "file"
-  ),
+  "/upload/video/",
+  multer({ storage, limits: { fieldSize: 1024 ** 1024 } }).single("file"),
   async (req, res) => {
     const { filename }: any = req.file;
     // console.log(req.params.id);
@@ -97,20 +70,31 @@ app.post(
     if (!user) return res.send({ error: { message: "login first" } });
     if (user.role == "client")
       return res.send({ error: { message: "your not admin" } });
-    const video = await DB.video.findUnique({ where: { id: req.params.id } });
-    // console.log(video, "ok");
+    const now = new Date();
+    const next48 = new Date(now.setDate(now.getDate() + 2));
+    try {
+      const makeVideo = await DB.video.create({
+        data: {
+          title: req.body.title,
+          photo: req.body.photo,
+          disc: req.body.disc,
+          isZoomMeet: false,
+          isLiveNow: false,
+          is48h: next48,
+          link: "/video/" + filename,
+          Classes: {
+            connect: {
+              id: req.body.class,
+            },
+          },
+        },
+      });
+      return res.json(makeVideo);
+    } catch (e) {
+      console.log(e);
 
-    if (!video) return res.send("video not found");
-
-    // console.log(req.params);
-
-    const videoUpdate = await DB.video.update({
-      where: { id: video.id },
-      data: {
-        link: "/video/" + filename,
-      },
-    });
-    return res.send(videoUpdate);
+      res.status(400).send(e);
+    }
   }
 );
 app.post("/pay/strip/:id", async (req, res) => {
@@ -194,6 +178,7 @@ const server = https.createServer(
 server.listen(2053, async () => {
   await DB.$connect();
   // console.log(server);
+  console.log(__dirname);
 
   console.log("server started on https://localhost:2053");
 });

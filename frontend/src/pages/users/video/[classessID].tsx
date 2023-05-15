@@ -23,6 +23,7 @@ const Page = () => {
           lecher {
             id
             title
+            is48h
             photo
           }
         }
@@ -41,22 +42,39 @@ const Page = () => {
       ) : (
         <MainCard title="All Videos">
           <Box sx={{ display: "flex", flexWrap: "wrap", gap: "20px" }}>
-            {(data.get_classes_by_id.lecher as any[]).map((v: any) => (
-              <Card sx={{ widows: "500px", cursor: "pointer" }}>
-                <CardMedia component="img" height={200} src={v.photo} />
-                <CardContent>
-                  <Typography>{v.title}</Typography>
-                </CardContent>
-                <CardActions>
-                  <Link href={"/users/video/view/" + v.id}>
-                    watch video{" "}
-                    {v.isLiveNow ? (
-                      <Typography color="red">Live</Typography>
-                    ) : null}
-                  </Link>
-                </CardActions>
-              </Card>
-            ))}
+            {(data.get_classes_by_id.lecher as any[])
+              .filter((v) => {
+                console.log(
+                  new Date(v.is48h).getDate(),
+                  new Date().getDate(),
+                  new Date(v.is48h).getMonth(),
+                  new Date().getMonth(),
+                  new Date(v.is48h).getHours(),
+                  new Date().getHours()
+                );
+
+                return (
+                  new Date(v.is48h).getDate() > new Date().getDate() &&
+                  new Date(v.is48h).getMonth() > new Date().getMonth() &&
+                  new Date(v.is48h).getHours() > new Date().getHours()
+                );
+              })
+              .map((v: any) => (
+                <Card sx={{ widows: "500px", cursor: "pointer" }}>
+                  <CardMedia component="img" height={200} src={v.photo} />
+                  <CardContent>
+                    <Typography>{v.title}</Typography>
+                  </CardContent>
+                  <CardActions>
+                    <Link href={"/users/video/view/" + v.id}>
+                      watch video{" "}
+                      {v.isLiveNow ? (
+                        <Typography color="red">Live</Typography>
+                      ) : null}
+                    </Link>
+                  </CardActions>
+                </Card>
+              ))}
             {data.get_classes_by_id.lecher.length == 0 && (
               <Typography>No videos</Typography>
             )}

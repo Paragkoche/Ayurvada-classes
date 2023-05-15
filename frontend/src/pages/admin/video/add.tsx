@@ -45,29 +45,19 @@ const Page = () => {
       }
     }
   `);
-  const [addVideo, { loading: loo, data: d, error: er }] = useMutation(gql`
-    mutation make_video(
-      $class: ID
-      $title: String
-      $photo: String
-      $disc: String
-      $isZoomMeet: Boolean
-      $isLiveNow: Boolean
-      $link: String
-    ) {
-      make_video(
-        classID: $class
-        title: $title
-        photo: $photo
-        disc: $disc
-        isZoomMeet: $isZoomMeet
-        isLiveNow: $isLiveNow
-        link: $link
-      ) {
-        id
-      }
+  function consume(stream: any, total = 0) {
+    while (stream.state === "readable") {
+      var data = stream.read();
+      total += data.byteLength;
+      console.log(
+        "received " + data.byteLength + " bytes (" + total + " bytes in total)."
+      );
     }
-  `);
+    if (stream.state === "waiting") {
+      stream.ready.then(() => consume(stream, total));
+    }
+    return stream.closed;
+  }
   return (
     <>
       <MainCard title="Add Video or Zoom meet Link">
@@ -76,36 +66,29 @@ const Page = () => {
             onSubmit={(e) => {
               e.preventDefault();
               setDis(true);
-              addVideo({
-                variables: {
-                  class: data.class,
-                  title: data.title,
-                  photo: data.photo,
-                  disc: data.disc,
-                  isZoomMeet: data.isZoomMeet,
-                  isLiveNow: data.isLiveNow,
-                  link: data.link,
-                },
+
+              const fromData = new FormData();
+              fromData.append("file", video, video.path);
+              fromData.append("class", data.class);
+              fromData.append("title", data.title);
+              fromData.append("photo", data.photo);
+              fromData.append("disc", data.disc);
+              // fromData.append("disc",data.disc);
+
+              fetch(URL + "/upload/video/", {
+                credentials: "include",
+                method: "POST",
+                body: fromData,
               })
-                .then((e) => {
-                  if (!e.data) return;
-                  if (!data.isZoomMeet) {
-                    const fromData = new FormData();
-                    fromData.append("file", video, video.path);
-                    fetch(URL + "/upload/video/" + e.data.make_video.id, {
-                      credentials: "include",
-                      method: "POST",
-                      body: fromData,
-                    }).then(
-                      () => {
-                        alert("video is posted");
-                      },
-                      () => {
-                        alert("video not is posted, Try again");
-                      }
-                    );
+                .then(
+                  (e) => {
+                    consume(e.body);
+                    alert("video is posted");
+                  },
+                  () => {
+                    alert("video not is posted, Try again");
                   }
-                })
+                )
                 .finally(() => {
                   setData({
                     class: "",
@@ -154,7 +137,7 @@ const Page = () => {
               />
             </FormControl>
             <FileUpload
-              sx={{ ...theme.typography.customInput }}
+              sx={{ ...theme.typography.customInput, marginX: 5 }}
               multiFile={false}
               acceptedType="image/*"
               title="Photo"
@@ -163,7 +146,7 @@ const Page = () => {
                 if (e.length != 0) setData((s) => ({ ...s, photo: e[0].path }));
               }}
             />
-
+            <Box sx={{ marginX: 5, width: 100, height: 10 }}></Box>
             {!data.isZoomMeet ? (
               <FileUpload
                 acceptedType="video/*"
@@ -181,41 +164,7 @@ const Page = () => {
                 <OutlinedInput />
               </FormControl>
             )}
-            <Stack
-              direction="row"
-              alignItems="center"
-              justifyContent="space-between"
-              spacing={1}
-            >
-              <FormControlLabel
-                sx={{ ...theme.typography.customInput }}
-                control={
-                  <Checkbox
-                    checked={data.isZoomMeet}
-                    onChange={() =>
-                      setData((s) => ({ ...s, isZoomMeet: !s.isZoomMeet }))
-                    }
-                    name="checked"
-                    color="primary"
-                  />
-                }
-                label="Is Zoom"
-              />
-              <FormControlLabel
-                sx={{ ...theme.typography.customInput }}
-                control={
-                  <Checkbox
-                    checked={data.isLiveNow}
-                    onChange={() =>
-                      setData((s) => ({ ...s, isLiveNow: !s.isLiveNow }))
-                    }
-                    name="checked"
-                    color="primary"
-                  />
-                }
-                label="Is Live Now"
-              />
-            </Stack>
+            <Box sx={{ marginX: 5, width: 100, height: 10 }}></Box>
             <AnimateButton>
               <Button
                 fullWidth

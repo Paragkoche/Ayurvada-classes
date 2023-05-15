@@ -5,6 +5,7 @@ import {
   Button,
   Divider,
   FormControl,
+  FormLabel,
   Grid,
   InputLabel,
   MenuItem,
@@ -24,6 +25,7 @@ import { EnumType } from "typescript";
 import React from "react";
 import { useRouter } from "next/router";
 import { date } from "yup";
+import { MultiSelect } from "react-mui-multi-select";
 const AuthWrapper1 = styled("div")(({ theme }) => ({
   backgroundColor: theme.palette.primary.light,
   minHeight: "60vh",
@@ -35,10 +37,28 @@ const update = () => {
   const { data, loading, error, refetch } = useQuery(gql`
    query{ 
       get_client_id(id: "${route.query.id}") {
+        id
         email
         name
         age
         gender
+      }
+     
+    }
+  `);
+  const {
+    data: _data,
+    loading: _loading,
+    error: _error,
+    refetch: _s,
+  } = useQuery(gql`
+    query {
+      get_all_classes {
+        id
+        name
+        PayUser {
+          id
+        }
       }
     }
   `);
@@ -50,6 +70,7 @@ const update = () => {
       $age: String
       $gender: User_Gander
       $password: String
+      $isPayfor: [Classes_ids!]!
     ) {
       update_user(
         name: $name
@@ -58,6 +79,7 @@ const update = () => {
         age: $age
         gender: $gender
         password: $password
+        isPayfor: $isPayfor
       ) {
         id
         name
@@ -70,12 +92,27 @@ const update = () => {
     }
   `);
   const [fromData, setFromData] = React.useState<any>();
-  console.log(fromData);
+  const [fromData_class, setFromData_class] = React.useState<any[]>([]);
+  console.log(fromData, fromData_class);
   React.useEffect(() => {
-    setFromData(data);
-  }, [data]);
+    if (data && _data) {
+      setFromData(data);
+      setFromData_class((s) => [
+        ...s,
+        ...(_data.get_all_classes as any[]).map((v) => {
+          let a = true;
+          v.isPayfor?.map((vv: any) => {
+            a = vv.id == data.get_client_id.id;
+          });
+          if (a) return v;
+        }),
+      ]);
+    }
+    // setFromData_class(_data);
+  }, [data, _data]);
   return (
     !loading &&
+    !_loading &&
     data &&
     fromData && (
       <>
@@ -188,6 +225,12 @@ const update = () => {
                             update_user({
                               variables: {
                                 ...fromData.get_client_id,
+                                isPayfor: [
+                                  ...fromData_class.map((v) => {
+                                    delete v.name;
+                                    return v;
+                                  }),
+                                ],
                                 id: route.query.id,
                               },
                             })
@@ -215,7 +258,7 @@ const update = () => {
                                   },
                                 }));
                               }}
-                              value={fromData.get_client_id.email}
+                              value={fromData?.get_client_id.email}
                             />
                           </FormControl>
                           <FormControl
@@ -308,7 +351,28 @@ const update = () => {
                               </Select>
                             </FormControl>
                           </Stack>
-                          <Box>
+                          <FormControl
+                            fullWidth
+                            sx={{ mt: 2 }}
+                            // sx={{ ...theme.typography.customInput }}
+                          >
+                            <FormLabel>Classes</FormLabel>
+                            <MultiSelect
+                              getOptionLabel={(value: any) => value.name}
+                              getOptionKey={(value: any): string => value.id}
+                              options={_data?.get_all_classes.map((v: any) => ({
+                                id: v.id,
+                                name: v.name,
+                              }))}
+                              value={fromData_class}
+                              onChange={(value) => {
+                                setFromData_class(value);
+                                console.log(value);
+                              }}
+                            ></MultiSelect>
+                          </FormControl>
+                          <br />
+                          <Box sx={{ mt: 5 }}>
                             <AnimateButton>
                               <Button
                                 disableElevation

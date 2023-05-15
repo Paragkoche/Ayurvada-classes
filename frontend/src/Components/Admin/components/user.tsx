@@ -73,7 +73,7 @@ export default () => {
   const handleClose = () => {
     setAnchorEl(null);
   };
-  return loading ? (
+  return loading && !data ? (
     error ? (
       <Card>
         <CardContent>

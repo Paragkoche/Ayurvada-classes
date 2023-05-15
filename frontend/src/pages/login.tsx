@@ -6,6 +6,8 @@ import { styled } from "@mui/material/styles";
 import { Box, Stack } from "@mui/system";
 import Link from "next/link";
 import { useQuery, gql } from "@apollo/client";
+import Image from "next/image";
+import markLogo from "../images/Mediamodifier-Design.svg";
 import FromsLogin from "../Components/Forms/Login";
 // ==============================|| AUTHENTICATION 1 WRAPPER ||============================== //
 
@@ -53,7 +55,11 @@ export default () => {
                   >
                     <Grid item sx={{ mb: 3 }}>
                       <Link href={"/"}>
-                        <h1>Tanwish Institute</h1>
+                        <Image
+                          style={{ width: "100%", height: "100px" }}
+                          src={markLogo}
+                          alt="logo"
+                        />
                       </Link>
                     </Grid>
                     <Grid item xs={12}>

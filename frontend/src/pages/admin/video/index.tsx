@@ -14,6 +14,7 @@ import {
   TableCell,
   TableContainer,
   TableHead,
+  TablePagination,
   TableRow,
 } from "@mui/material";
 import { Table } from "@mui/material";
@@ -26,7 +27,13 @@ import { IconButton } from "@mui/material";
 import { useRouter } from "next/router";
 import { URL } from "@/api";
 import React from "react";
-
+export function applyPagination(
+  documents: any,
+  page: number,
+  rowsPerPage: number
+) {
+  return documents.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+}
 const Page = () => {
   const theme = useTheme();
   const router = useRouter();
@@ -62,6 +69,22 @@ const Page = () => {
   }, []);
   const [D, setD] = React.useState("");
   const [dd, setDd] = React.useState(false);
+  const [page, setPage] = React.useState(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  React.useEffect(() => {
+    return setData(
+      applyPagination(data?.get_all_videos || [], page, rowsPerPage)
+    );
+  }, [page, rowsPerPage, data]);
+  const handlePageChange = React.useCallback((event: any, value: any) => {
+    setPage(value);
+  }, []);
+  const [_data, setData] = React.useState(
+    applyPagination(data?.get_all_videos || [], page, rowsPerPage)
+  );
+  const handleRowsPerPageChange = React.useCallback((event: any) => {
+    setRowsPerPage(event.target.value);
+  }, []);
   return (
     !loading &&
     data && (
@@ -162,8 +185,8 @@ const Page = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {data.get_all_videos.map((v: any) => (
-                  <TableRow>
+                {_data.map((v: any, i: any) => (
+                  <TableRow key={i}>
                     <TableCell>
                       <Typography
                         flexWrap={"wrap"}
@@ -248,6 +271,15 @@ const Page = () => {
               </TableBody>
             </Table>
           </TableContainer>
+          <TablePagination
+            component="div"
+            count={data.get_all_videos.length}
+            onPageChange={handlePageChange}
+            onRowsPerPageChange={handleRowsPerPageChange}
+            page={page}
+            rowsPerPage={rowsPerPage}
+            rowsPerPageOptions={[5, 10, 25]}
+          />
         </MainCard>
         <Dialog open={dd}>
           <DialogTitle>Do you want to {D} this Video?</DialogTitle>

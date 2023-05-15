@@ -13,6 +13,7 @@ export const UserType = new gql.GraphQLObjectType({
     gender: { type: Gender_Enum },
     role: { type: Role_Enum },
     is_active: { type: gql.GraphQLBoolean },
+    // isPayfor: { type:new gql.GraphQLList(Classes) },
   }),
 });
 export const Gender_Enum = new gql.GraphQLEnumType({
@@ -71,6 +72,14 @@ export const Link = new gql.GraphQLObjectType({
     },
     likeBy: {
       type: UserType,
+    },
+  }),
+});
+export const class_id = new gql.GraphQLInputObjectType({
+  name: "Classes_ids",
+  fields: () => ({
+    id: {
+      type: gql.GraphQLString,
     },
   }),
 });

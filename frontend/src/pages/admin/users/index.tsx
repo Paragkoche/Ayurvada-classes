@@ -20,6 +20,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TablePagination,
 } from "@mui/material";
 import { Table } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
@@ -36,8 +37,19 @@ import { useTheme } from "@mui/material";
 import { IconButton } from "@mui/material";
 import { useRouter } from "next/router";
 import React from "react";
+export function applyPagination(
+  documents: any,
+  page: number,
+  rowsPerPage: number
+) {
+  console.log(documents);
 
+  return documents.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+}
 const Page = () => {
+  const [page, setPage] = React.useState(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+
   const theme = useTheme();
   const router = useRouter();
   const [dialog, setDialog] = React.useState(false);
@@ -59,6 +71,13 @@ const Page = () => {
       }
     }
   `);
+
+  const [_data, setData] = React.useState(
+    applyPagination(data?.get_client || [], page, rowsPerPage)
+  );
+  React.useEffect(() => {
+    return setData(applyPagination(data?.get_client || [], page, rowsPerPage));
+  }, [page, rowsPerPage, data]);
   const [deleteStudent, { loading: loo, data: d, error: er }] = useMutation(gql`
     mutation delete_client($id: ID) {
       delete_client(id: $id) {
@@ -66,6 +85,14 @@ const Page = () => {
       }
     }
   `);
+
+  const handlePageChange = React.useCallback((event: any, value: any) => {
+    setPage(value);
+  }, []);
+
+  const handleRowsPerPageChange = React.useCallback((event: any) => {
+    setRowsPerPage(event.target.value);
+  }, []);
 
   return (
     !loading &&
@@ -149,7 +176,7 @@ const Page = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {data.get_client.map((v: any) => (
+                {_data.map((v: any) => (
                   <TableRow>
                     <TableCell>
                       <Typography
@@ -212,6 +239,15 @@ const Page = () => {
               </TableBody>
             </Table>
           </TableContainer>
+          <TablePagination
+            component="div"
+            count={data.get_client.length}
+            onPageChange={handlePageChange}
+            onRowsPerPageChange={handleRowsPerPageChange}
+            page={page}
+            rowsPerPage={rowsPerPage}
+            rowsPerPageOptions={[5, 10, 25]}
+          />
         </MainCard>
         <Dialog open={dialog}>
           <DialogTitle>Do you want to {D} this student?</DialogTitle>
