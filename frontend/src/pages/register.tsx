@@ -11,6 +11,8 @@ import {
 } from "@mui/material";
 import Link from "next/link";
 import Registration from "../Components/Forms/Registration";
+import markLogo from "../images/Mediamodifier-Design.svg";
+import Image from "next/image";
 const AuthWrapper1 = styled("div")(({ theme }) => ({
   backgroundColor: theme.palette.primary.light,
   minHeight: "100vh",
@@ -54,7 +56,7 @@ export default () => {
                   >
                     <Grid item sx={{ mb: 3 }}>
                       <Link href={"/"}>
-                        <h1>Tanwish Institute</h1>
+                        <Image style={{width: '100%',height: '100px'}} src={markLogo} alt="logo" />
                       </Link>
                     </Grid>
                     <Grid item xs={12}>

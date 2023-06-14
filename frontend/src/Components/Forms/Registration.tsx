@@ -21,7 +21,7 @@ import {
   useMediaQuery,
 } from "@mui/material";
 
-import * as Yup from "yup";
+import Joi from 'joi';
 import { Formik } from "formik";
 
 // assets
@@ -75,6 +75,11 @@ const FirebaseLogin = ({ ...others }) => {
     event.preventDefault();
   };
 
+  const validationSchema = Joi.object({
+    email: Joi.string().email({ tlds: { allow: false } }).max(225).required(),
+    password: Joi.string().max(255).required(),
+  });
+
   return (
     <>
       <Grid container direction="column" justifyContent="center" spacing={2}>
@@ -107,7 +112,7 @@ const FirebaseLogin = ({ ...others }) => {
 
       <Formik
         initialValues={{
-          email: "abc@xyz.com",
+          email: "abc@gmail.com",
           name: "XYZ",
           password: "...",
           contantNo: "+91 80XXXXXXX0",
@@ -115,13 +120,18 @@ const FirebaseLogin = ({ ...others }) => {
           gander: "Male",
           submit: null,
         }}
-        validationSchema={Yup.object().shape({
-          email: Yup.string()
-            .email("Must be a valid email")
-            .max(255)
-            .required("Email is required"),
-          password: Yup.string().max(255).required("Password is required"),
-        })}
+        validate={(values) => {
+          const validationResult = validationSchema.validate(values, { abortEarly: false });
+          if (validationResult.error) {
+            return validationResult.error.details.reduce((errors, error) => {
+              return {
+                ...errors,
+                [error.path[0]]: error.message,
+              };
+            }, {});
+          }
+          return {};
+        }}
         onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
           console.log(values);
 
