@@ -12,8 +12,9 @@ import {
 import { Formik } from "formik";
 import { Grid } from "@mui/material";
 import Yup from "yup";
-import FileUpload from "react-mui-fileuploader";
+// import FileUpload from "react-mui-fileuploader";
 import React from "react";
+import FileUpload from "react-mui-fileuploader";
 import AnimateButton from "@/Components/extr/AnimateButton";
 import { gql, useMutation } from "@apollo/client";
 const AuthWrapper1 = styled("div")(({ theme }) => ({}));

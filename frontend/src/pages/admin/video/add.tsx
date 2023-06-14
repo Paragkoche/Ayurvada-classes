@@ -79,6 +79,9 @@ const Page = () => {
                 credentials: "include",
                 method: "POST",
                 body: fromData,
+                headers: {
+                  "content-type": "multipart/form-data",
+                },
               })
                 .then(
                   (e) => {

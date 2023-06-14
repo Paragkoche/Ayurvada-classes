@@ -21,8 +21,8 @@ import React from "react";
 import { BrowserView, MobileView } from "react-device-detect";
 import { useRouter } from "next/router";
 import { URL } from "@/api";
-import { FALSE } from "sass";
-
+import SVG from "../../images/Mediamodifier-Design.svg";
+import Image from "next/image";
 const drawerWidth = 280;
 const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
   ({ theme, open }: { theme: any; open: boolean }) => ({
@@ -128,7 +128,11 @@ const Header = ({ handleLeftDrawerToggle, data }: any) => {
             marginLeft: "20px",
           }}
         >
-          <Typography component={"h1"}>Tanwish Institute</Typography>
+          <Image
+            style={{ width: "100%", height: "50px" }}
+            src={SVG}
+            alt="logo"
+          />
         </Box>
       </Box>
 
@@ -245,9 +249,13 @@ export default ({ children }: any) => {
               </Avatar>
             </ButtonBase>
             <Box sx={{ display: "flex", p: 2, mx: "auto" }}>
-              <Typography component={"h1"} sx={{ fontWeight: "bold" }}>
-                Tanwish Institute
-              </Typography>
+              <Box sx={{ display: "flex", p: 2, mx: "auto" }}>
+                <Image
+                  style={{ width: "100%", height: "50px" }}
+                  src={SVG}
+                  alt="logo"
+                />
+              </Box>
             </Box>
           </Box>
           <BrowserView>

@@ -14,6 +14,7 @@ import {
   useTheme,
 } from "@mui/material";
 import { Card, CardContent, Grid } from "@mui/material";
+import { useRouter } from "next/router";
 const CardWrapper = styled(MainCard)(({ theme }: any) => ({
   cursor: "pointer",
   backgroundColor: theme.palette.primary.dark,
@@ -42,6 +43,7 @@ const CardWrapper = styled(MainCard)(({ theme }: any) => ({
   },
 }));
 export default () => {
+  const router = useRouter();
   const theme: any = useTheme();
   const { loading, data, error } = useQuery(gql`
     query {
@@ -82,7 +84,13 @@ export default () => {
       </Card>
     )
   ) : (
-    <CardWrapper border={false} content={false}>
+    <CardWrapper
+      border={false}
+      content={false}
+      onClick={() => {
+        router.push("/admin/classes");
+      }}
+    >
       <Box sx={{ p: 2.25 }}>
         <Grid container direction="column">
           <Grid item>

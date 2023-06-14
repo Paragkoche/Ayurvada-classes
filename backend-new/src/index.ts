@@ -53,7 +53,7 @@ const storage = multer.diskStorage({
 });
 app.post(
   "/upload/video/",
-  multer({ storage, limits: { fieldSize: 1024 ** 1024 } }).single("file"),
+  multer({ storage, limits: { fieldSize: 1024 ** 1024 }, }).single("file"),
   async (req, res) => {
     const { filename }: any = req.file;
     // console.log(req.params.id);
@@ -168,17 +168,17 @@ app.listen(8085, async () => {
   await DB.$connect();
   console.log("server start on  http://loaclhost:8085");
 });
-const server = https.createServer(
-  {
-    key: fs.readFileSync("./src/privatekey.pem"),
-    cert: fs.readFileSync("./src/certificate.pem"),
-  },
-  app
-);
-server.listen(2053, async () => {
-  await DB.$connect();
-  // console.log(server);
-  console.log(__dirname);
+// const server = https.createServer(
+//   {
+//     key: fs.readFileSync("./src/privatekey.pem"),
+//     cert: fs.readFileSync("./src/certificate.pem"),
+//   },
+//   app
+// );
+// server.listen(2053, async () => {
+//   await DB.$connect();
+//   // console.log(server);
+//   console.log(__dirname);
 
-  console.log("server started on https://localhost:2053");
-});
+//   console.log("server started on https://localhost:2053");
+// });

@@ -109,7 +109,7 @@ export default () => {
       border={false}
       content={false}
       onClick={() => {
-        router.push("/admin/user");
+        router.push("/admin/users");
       }}
     >
       <Box sx={{ p: 2.25 }}>
