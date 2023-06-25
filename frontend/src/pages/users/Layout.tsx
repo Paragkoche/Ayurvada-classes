@@ -146,13 +146,13 @@ const Header = ({ handleLeftDrawerToggle, data }: any) => {
 
 export default ({ children }: any) => {
   const router = useRouter();
-  React.useEffect(() => {
-    let token = Object.fromEntries(
-      new URLSearchParams(document.cookie.replace(/; /g, "&"))
-    );
-    if (!token.token) router.push("/login");
-    return () => {};
-  }, []);
+  // React.useEffect(() => {
+  //   let token = Object.fromEntries(
+  //     new URLSearchParams(document.cookie.replace(/; /g, "&"))
+  //   );
+  //   if (!token.token) router.push("/login");
+  //   return () => {};
+  // }, []);
 
   const [handleLeftDrawerToggle, sethandleLeftDrawerToggle] =
     React.useState(false);

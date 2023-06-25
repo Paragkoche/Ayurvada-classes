@@ -62,6 +62,8 @@ export default () => {
       }
     }
   `);
+  console.log(data);
+
   const [anchorEl, setAnchorEl] = React.useState(null);
 
   const handleClick = (event: {
@@ -105,79 +107,81 @@ export default () => {
       </Card>
     )
   ) : (
-    <CardWrapper
-      border={false}
-      content={false}
-      onClick={() => {
-        router.push("/admin/users");
-      }}
-    >
-      <Box sx={{ p: 2.25 }}>
-        <Grid container direction="column">
-          <Grid item>
-            <Grid container justifyContent="space-between">
-              <Grid item>
-                <Avatar
-                  variant="rounded"
-                  sx={{
-                    ...theme.typography.commonAvatar,
-                    ...theme.typography.largeAvatar,
-                    cursor: "auto",
-                    backgroundColor: theme.palette.secondary[800],
-                    mt: 1,
-                  }}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="icon icon-tabler icon-tabler-user"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="#FFF"
-                    fill="none"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
+    data && (
+      <CardWrapper
+        border={false}
+        content={false}
+        onClick={() => {
+          router.push("/admin/users");
+        }}
+      >
+        <Box sx={{ p: 2.25 }}>
+          <Grid container direction="column">
+            <Grid item>
+              <Grid container justifyContent="space-between">
+                <Grid item>
+                  <Avatar
+                    variant="rounded"
+                    sx={{
+                      ...theme.typography.commonAvatar,
+                      ...theme.typography.largeAvatar,
+                      cursor: "auto",
+                      backgroundColor: theme.palette.secondary[800],
+                      mt: 1,
+                    }}
                   >
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                    <circle cx="12" cy="7" r="4" />
-                    <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
-                  </svg>
-                </Avatar>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="icon icon-tabler icon-tabler-user"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="#FFF"
+                      fill="none"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                      <circle cx="12" cy="7" r="4" />
+                      <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+                    </svg>
+                  </Avatar>
+                </Grid>
               </Grid>
             </Grid>
-          </Grid>
-          <Grid item>
-            <Grid container alignItems="center">
-              <Grid item>
-                <Typography
-                  sx={{
-                    fontSize: "2.125rem",
-                    fontWeight: 500,
-                    mr: 1,
-                    mt: 1.75,
-                    mb: 0.75,
-                  }}
-                >
-                  {data.get_client.length}
-                </Typography>
+            <Grid item>
+              <Grid container alignItems="center">
+                <Grid item>
+                  <Typography
+                    sx={{
+                      fontSize: "2.125rem",
+                      fontWeight: 500,
+                      mr: 1,
+                      mt: 1.75,
+                      mb: 0.75,
+                    }}
+                  >
+                    {data.get_client.length}
+                  </Typography>
+                </Grid>
+                <Grid item></Grid>
               </Grid>
-              <Grid item></Grid>
+            </Grid>
+            <Grid item sx={{ mb: 1.25 }}>
+              <Typography
+                sx={{
+                  fontSize: "1rem",
+                  fontWeight: 500,
+                  color: theme.palette.secondary[200],
+                }}
+              >
+                Total Students
+              </Typography>
             </Grid>
           </Grid>
-          <Grid item sx={{ mb: 1.25 }}>
-            <Typography
-              sx={{
-                fontSize: "1rem",
-                fontWeight: 500,
-                color: theme.palette.secondary[200],
-              }}
-            >
-              Total Students
-            </Typography>
-          </Grid>
-        </Grid>
-      </Box>
-    </CardWrapper>
+        </Box>
+      </CardWrapper>
+    )
   );
 };
