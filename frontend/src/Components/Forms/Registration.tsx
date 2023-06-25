@@ -21,7 +21,7 @@ import {
   useMediaQuery,
 } from "@mui/material";
 
-import Joi from 'joi';
+import Joi from "joi";
 import { Formik } from "formik";
 
 // assets
@@ -76,7 +76,10 @@ const FirebaseLogin = ({ ...others }) => {
   };
 
   const validationSchema = Joi.object({
-    email: Joi.string().email({ tlds: { allow: false } }).max(225).required(),
+    email: Joi.string()
+      .email({ tlds: { allow: false } })
+      .max(225)
+      .required(),
     password: Joi.string().max(255).required(),
   });
 
@@ -121,7 +124,9 @@ const FirebaseLogin = ({ ...others }) => {
           submit: null,
         }}
         validate={(values) => {
-          const validationResult = validationSchema.validate(values, { abortEarly: false });
+          const validationResult = validationSchema.validate(values, {
+            abortEarly: false,
+          });
           if (validationResult.error) {
             return validationResult.error.details.reduce((errors, error) => {
               return {

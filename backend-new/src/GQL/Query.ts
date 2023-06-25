@@ -239,7 +239,7 @@ export default new gql.GraphQLObjectType({
       resolve: async (_, __, ctx: ctx) => {
         const a = await DB.classes.findUnique({
           where: {
-            id: __.id,  
+            id: __.id,
           },
           select: {
             lecher: true,
