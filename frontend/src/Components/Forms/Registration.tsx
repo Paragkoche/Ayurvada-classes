@@ -76,11 +76,11 @@ const FirebaseLogin = ({ ...others }) => {
   };
 
   const validationSchema = Joi.object({
-    email: Joi.string()
-      .email({ tlds: { allow: false } })
-      .max(225)
-      .required(),
-    password: Joi.string().max(255).required(),
+    // email: Joi.string()
+    //   .email({ tlds: { allow: false } })
+    //   .max(225)
+    //   .required(),
+    // password: Joi.string().max(255).required(),
   });
 
   return (
