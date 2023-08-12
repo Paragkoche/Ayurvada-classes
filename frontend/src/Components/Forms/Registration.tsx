@@ -76,11 +76,15 @@ const FirebaseLogin = ({ ...others }) => {
   };
 
   const validationSchema = Joi.object({
-    // email: Joi.string()
-    //   .email({ tlds: { allow: false } })
-    //   .max(225)
-    //   .required(),
-    // password: Joi.string().max(255).required(),
+    email: Joi.string()
+      .email({ tlds: { allow: false } })
+      .max(225)
+      .required(),
+    name: Joi.string().max(255).required(),
+    password: Joi.string().max(255).required(),
+    contantNo: Joi.string().max(255).required(),
+    age: Joi.string().max(255).required(),
+    gander: Joi.string().max(255).required(),
   });
 
   return (
@@ -121,7 +125,6 @@ const FirebaseLogin = ({ ...others }) => {
           contantNo: "+91 80XXXXXXX0",
           age: "8".toString(),
           gander: "Male",
-          submit: null,
         }}
         validate={(values) => {
           const validationResult = validationSchema.validate(values, {
@@ -155,7 +158,6 @@ const FirebaseLogin = ({ ...others }) => {
             console.log(error);
 
             setStatus({ success: false });
-            setErrors({ submit: error?.message });
             setSubmitting(false);
           }
         }}
