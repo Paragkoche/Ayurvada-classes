@@ -3,6 +3,7 @@
 /create-react-app
 *.zip
 /test
-/backend
+/backend-new
 /code
 /frontend/_static
+node_modules
