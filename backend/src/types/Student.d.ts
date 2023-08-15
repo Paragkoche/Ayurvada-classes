@@ -5,11 +5,11 @@ export interface StudentTokenRequest extends Request {
   studentData: User;
 }
 export interface StudentInput {
-  name: string;
-  email: string;
-  age: number;
-  password: string;
-  gender: string;
+  name?: string;
+  email?: string;
+  age?: number;
+  password?: string;
+  gender?: string;
 }
 
 export interface StudentLoingInput {

@@ -97,3 +97,6 @@ export const StudentToken = async (
     });
   }
 };
+export const makeToken = (data: { id: string }) => {
+  return jwt.sign(data, process.env.token_key);
+};

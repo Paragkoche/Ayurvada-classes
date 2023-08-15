@@ -1,42 +1,69 @@
 import { StudentInput, StudentLoingInput } from "@/types/Student";
 import { NextFunction, Request, Response } from "express";
+import db from "@/Database";
+import { User } from "@/Database/Entity/Users.entity";
 let password_regx = /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,16}$/;
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-export const UserRagistration = (
+const userDB = db.getRepository(User);
+
+export const UserRegistration = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const { name, email, age, password, gender }: StudentInput = req.body;
-    if (!name && !email && !age && !password && !gender)
+    const data: StudentInput | any = req.body;
+    console.log(data);
+
+    if (
+      data == undefined ||
+      data.name == undefined ||
+      data.email == undefined ||
+      data.age == undefined ||
+      data.password == undefined ||
+      data.gender == undefined
+    )
       return res.status(201).json({
         status: 201,
-        message: "input filde not complite",
+        message: "The input fields have not been properly completed.",
       });
     if (
-      gender.toLocaleLowerCase() != "female" ||
-      gender.toLocaleLowerCase() != "male" ||
-      gender.toLocaleLowerCase() != "other"
+      data.gender.toLocaleLowerCase() != "female" &&
+      data.gender.toLocaleLowerCase() != "male" &&
+      data.gender.toLocaleLowerCase() != "other"
     )
       return res.status(201).json({
         status: 201,
         message: "gender must be female, male, or other",
       });
-    if (password.length >= 8 || !password_regx.test(password))
+    console.log(data.password.length <= 8);
+
+    if (data.password.length <= 8 || !password_regx.test(data.password))
       return res.status(201).json({
         status: 401,
         message:
           "Password must be at least 8 characters long or include special characters.",
       });
 
-    if (!emailRegex.test(email))
+    if (!emailRegex.test(data.email))
       return res.status(201).json({
         status: 201,
         message: "email id not valid",
       });
+    const email_used = await userDB.findOne({
+      where: {
+        email: data.email,
+      },
+    });
+    if (email_used)
+      return res.status(201).json({
+        status: 201,
+        message: "The email ID is already in use.",
+      });
     return next();
   } catch (e) {
+    console.log(e);
+
     return res.status(500).json({
       status: 500,
       message: "Internal server error",
@@ -45,7 +72,7 @@ export const UserRagistration = (
   }
 };
 
-export const UserLoing = (req: Request, res: Response, next: NextFunction) => {
+export const UserLogin = (req: Request, res: Response, next: NextFunction) => {
   try {
     const { email, password }: StudentLoingInput = req.body;
     if (!email && !password)
