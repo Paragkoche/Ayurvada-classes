@@ -8,5 +8,9 @@ router.post("/register", validation.UserRegistration, controller.register);
 router.post("/login", validation.UserLogin, controller.Login);
 router.get("/your-pay-course", StudentToken, controller.your_course);
 router.get("/all-classes", StudentToken, controller.all_course);
-
+router.get("/get-all-video/:id", StudentToken, controller.get_all_video);
+router.get("/get-video/:id", StudentToken, controller.get_video);
+router.post("/video/like/:id", StudentToken, controller.add_like);
+router.post("/video/comment/:id", StudentToken, controller.add_comment_video);
+router.post("/comment/comment/:id", StudentToken, controller.add_comment);
 export default router;
