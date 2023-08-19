@@ -1,4 +1,4 @@
-import { StudentInput, StudentLoingInput } from "@/types/Student";
+import { StudentInput, StudentLoginInput } from "@/types/Student";
 import { NextFunction, Request, Response } from "express";
 import db from "@/Database";
 import { User } from "@/Database/Entity/Users.entity";
@@ -54,6 +54,7 @@ export const UserRegistration = async (
       where: {
         email: data.email,
       },
+      cache: true,
     });
     if (email_used)
       return res.status(201).json({
@@ -74,11 +75,11 @@ export const UserRegistration = async (
 
 export const UserLogin = (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { email, password }: StudentLoingInput = req.body;
+    const { email, password }: StudentLoginInput = req.body;
     if (!email && !password)
       return res.status(201).json({
         status: 201,
-        message: "input filde not complite",
+        message: "input filed not complete",
       });
     return next();
   } catch (e) {

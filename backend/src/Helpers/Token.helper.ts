@@ -17,7 +17,7 @@ export const AdminToken = async (
     if (!key)
       return res.status(201).json({
         status: 201,
-        message: "Unauthorization",
+        message: "Un-Authorization",
       });
     else {
       const token = key.split(" ").at(-1);
@@ -62,7 +62,7 @@ export const StudentToken = async (
     if (!key)
       return res.status(201).json({
         status: 201,
-        message: "Unauthorization",
+        message: "Un-Authorization",
       });
     else {
       const token = key.split(" ").at(-1);
@@ -98,5 +98,7 @@ export const StudentToken = async (
   }
 };
 export const makeToken = (data: { id: string }) => {
-  return jwt.sign(data, process.env.token_key);
+  return jwt.sign(data, process.env.token_key, {
+    expiresIn: "100d",
+  });
 };

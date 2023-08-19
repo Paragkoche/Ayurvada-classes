@@ -12,7 +12,7 @@ export interface StudentInput {
   gender?: string;
 }
 
-export interface StudentLoingInput {
+export interface StudentLoginInput {
   email: string;
   password: string;
 }
