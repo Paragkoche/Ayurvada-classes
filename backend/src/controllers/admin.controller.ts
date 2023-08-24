@@ -5,6 +5,7 @@ import { Comment, Like, Video } from "@/Database/Entity/Video.entity";
 import { AdminTokenRequest } from "@/types/Admin";
 import { StudentInput } from "@/types/Student";
 import { Response } from "express";
+import { randomUUID } from "crypto";
 import fs from "fs";
 
 const UserDb = db.getRepository(User);
@@ -188,7 +189,7 @@ export const Add_Video = async (req: AdminTokenRequest, res: Response) => {
       });
       stream.on("close", () => {
         console.log("Processing  ...  100%");
-        resolve("./ok.mp4");
+        resolve(`./video/${randomUUID()}.mp4`);
       });
       stream.on("drain", () => {
         const written = parseInt(stream.bytesWritten.toString());
