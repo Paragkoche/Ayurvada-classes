@@ -7,7 +7,28 @@ import { StudentInput } from "@/types/Student";
 import { Response } from "express";
 import { randomUUID } from "crypto";
 import fs from "fs";
+import disk from "diskusage";
+function formatBytes(bytes, decimals = 2) {
+  if (!+bytes) return "0 Bytes";
 
+  const k = 1024;
+  const dm = decimals < 0 ? 0 : decimals;
+  const sizes = [
+    "Bytes",
+    "KiB",
+    "MiB",
+    "GiB",
+    "TiB",
+    "PiB",
+    "EiB",
+    "ZiB",
+    "YiB",
+  ];
+
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+}
 const UserDb = db.getRepository(User);
 const ClassesDb = db.getRepository(Classes);
 const CommentDb = db.getRepository(Comment);
@@ -16,6 +37,11 @@ const LikeDb = db.getRepository(Like);
 
 export const Home = async (req: AdminTokenRequest, res: Response) => {
   try {
+    const formtter = new Intl.NumberFormat("en", {
+      unit: "gigabyte",
+      style: "unit",
+    });
+    const Disk = await disk.check("./");
     const [_UserData, UserCount] = await UserDb.findAndCount({
       where: {
         role: "Student",
@@ -57,6 +83,11 @@ export const Home = async (req: AdminTokenRequest, res: Response) => {
     return res.json({
       status: 200,
       data: {
+        storage: {
+          available: formatBytes(Disk.available),
+          free: formatBytes(Disk.free),
+          total: formatBytes(Disk.total),
+        },
         Students: {
           count: UserCount,
         },
