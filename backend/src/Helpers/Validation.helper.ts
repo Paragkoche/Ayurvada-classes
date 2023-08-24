@@ -90,3 +90,14 @@ export const UserLogin = (req: Request, res: Response, next: NextFunction) => {
     });
   }
 };
+
+export const ClassesAdd = (req: Request, res: Response, next: NextFunction) => {
+  try {
+  } catch (e) {
+    return res.status(500).json({
+      status: 500,
+      message: "Internal server error",
+      error: e,
+    });
+  }
+};
