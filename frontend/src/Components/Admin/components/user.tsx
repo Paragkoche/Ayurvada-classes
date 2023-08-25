@@ -52,16 +52,18 @@ const CardWrapper = styled(MainCard)(({ theme }: any) => ({
     },
   },
 }));
-export default () => {
+export default ({
+  loading,
+  data,
+  error,
+}: {
+  loading: boolean;
+  data?: number;
+  error: { message?: string | undefined };
+}) => {
   const router = useRouter();
   const theme: any = useTheme();
-  const { loading, data, error } = useQuery(gql`
-    query {
-      get_client {
-        id
-      }
-    }
-  `);
+
   console.log(data);
 
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -107,7 +109,7 @@ export default () => {
       </Card>
     )
   ) : (
-    data && (
+    (data && (
       <CardWrapper
         border={false}
         content={false}
@@ -162,7 +164,7 @@ export default () => {
                       mb: 0.75,
                     }}
                   >
-                    {data.get_client.length}
+                    {data}
                   </Typography>
                 </Grid>
                 <Grid item></Grid>
@@ -182,6 +184,6 @@ export default () => {
           </Grid>
         </Box>
       </CardWrapper>
-    )
+    )) || <></>
   );
 };

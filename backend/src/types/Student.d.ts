@@ -10,6 +10,7 @@ export interface StudentInput {
   age?: number;
   password?: string;
   gender?: string;
+  otp?: string;
 }
 
 export interface StudentLoginInput {

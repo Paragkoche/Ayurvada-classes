@@ -4,11 +4,10 @@ import { ThemeProvider } from "@mui/material/styles";
 import { CssBaseline, StyledEngineProvider } from "@mui/material";
 import { ApolloProvider } from "@apollo/client";
 import themes from "../theme";
-import { client } from "../api";
 export default function App({ Component, pageProps }: AppProps | any) {
   const getLayout = Component.getLayout ?? ((page: any) => page);
   return (
-    <ApolloProvider client={client}>
+    
       <StyledEngineProvider>
         <ThemeProvider
           theme={themes({
@@ -23,6 +22,6 @@ export default function App({ Component, pageProps }: AppProps | any) {
           {getLayout(<Component {...pageProps} />)}
         </ThemeProvider>
       </StyledEngineProvider>
-    </ApolloProvider>
+ 
   );
 }

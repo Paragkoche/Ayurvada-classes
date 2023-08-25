@@ -16,9 +16,10 @@ import {
 import React from "react";
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { useTheme } from "@emotion/react";
-import FileUpload from "react-mui-fileuploader";
+import FileUpload from "@/Components/FileUpload";
 import AnimateButton from "@/Components/extr/AnimateButton";
 import { URL } from "@/api";
+import VideoUpload from "@/Components/VideoUpload";
 
 const Page = () => {
   const theme: any = useTheme();
@@ -28,23 +29,11 @@ const Page = () => {
     title: "",
     photo: "",
     disc: "",
-    isZoomMeet: false,
-    isLiveNow: false,
+
     link: null,
   });
   const [dis, setDis] = React.useState(false);
-  const {
-    data: _data,
-    loading,
-    error,
-  } = useQuery(gql`
-    query {
-      get_all_classes {
-        id
-        name
-      }
-    }
-  `);
+
   function consume(stream: any, total = 0) {
     while (stream.state === "readable") {
       var data = stream.read();
@@ -60,50 +49,12 @@ const Page = () => {
   }
   return (
     <>
-      <MainCard title="Add Video or Zoom meet Link">
+      <MainCard title="Add Video">
         <Box px={20} py={3}>
           <form
             onSubmit={(e) => {
               e.preventDefault();
               setDis(true);
-
-              const fromData = new FormData();
-              fromData.append("file", video, video.path);
-              fromData.append("class", data.class);
-              fromData.append("title", data.title);
-              fromData.append("photo", data.photo);
-              fromData.append("disc", data.disc);
-              // fromData.append("disc",data.disc);
-
-              fetch(URL + "/upload/video/", {
-                credentials: "include",
-                method: "POST",
-                body: fromData,
-                headers: {
-                  "content-type": "multipart/form-data",
-                },
-              })
-                .then(
-                  (e) => {
-                    consume(e.body);
-                    alert("video is posted");
-                  },
-                  () => {
-                    alert("video not is posted, Try again");
-                  }
-                )
-                .finally(() => {
-                  setData({
-                    class: "",
-                    title: "",
-                    photo: "",
-                    disc: "",
-                    isZoomMeet: false,
-                    isLiveNow: false,
-                    link: null,
-                  });
-                  setDis(false);
-                });
             }}
           >
             <FormControl fullWidth sx={{ ...theme.typography.customInput }}>
@@ -114,10 +65,10 @@ const Page = () => {
                   setData((s) => ({ ...s, class: e.target.value }))
                 }
               >
-                {_data &&
+                {/* {_data &&
                   _data.get_all_classes.map((v: any) => (
                     <MenuItem value={v.id}>{v.name}</MenuItem>
-                  ))}
+                  ))} */}
               </Select>
             </FormControl>
             <FormControl fullWidth sx={{ ...theme.typography.customInput }}>
@@ -140,33 +91,19 @@ const Page = () => {
               />
             </FormControl>
             <FileUpload
-              sx={{ ...theme.typography.customInput, marginX: 5 }}
-              multiFile={false}
-              acceptedType="image/*"
-              title="Photo"
-              getBase64
-              onFilesChange={(e) => {
-                if (e.length != 0) setData((s) => ({ ...s, photo: e[0].path }));
+              imageLink={data.photo}
+              onChange={(e) => {
+                setData({ ...data, photo: e });
+              }}
+            />
+            <br />
+            <VideoUpload
+              onChange={(e) => {
+                console.log(e);
               }}
             />
             <Box sx={{ marginX: 5, width: 100, height: 10 }}></Box>
-            {!data.isZoomMeet ? (
-              <FileUpload
-                acceptedType="video/*"
-                allowedExtensions={["mp4"]}
-                sx={{ ...theme.typography.customInput }}
-                multiFile={false}
-                title="Video"
-                onFilesChange={(e) => {
-                  if (e.length != 0) setVideo(e[0]);
-                }}
-              />
-            ) : (
-              <FormControl fullWidth sx={{ ...theme.typography.customInput }}>
-                <InputLabel>Invite Link</InputLabel>
-                <OutlinedInput />
-              </FormControl>
-            )}
+
             <Box sx={{ marginX: 5, width: 100, height: 10 }}></Box>
             <AnimateButton>
               <Button

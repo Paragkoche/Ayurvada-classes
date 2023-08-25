@@ -32,25 +32,14 @@ import AnimateButton from "../extr/AnimateButton";
 import { gql, useMutation } from "@apollo/client";
 import { useRouter } from "next/router";
 import Link from "next/link";
+import { Login } from "@/api";
 
 const FirebaseLogin = ({ ...others }) => {
   const router = useRouter();
   const theme: any = useTheme();
   const matchDownSM = useMediaQuery(theme.breakpoints.down("md"));
   const [checked, setChecked] = useState(true);
-  const [Login_client, { data, loading, error }] = useMutation(gql`
-    mutation login($password: String, $email: String) {
-      login(password: $password, email: $email) {
-        id
-        name
-        email
-        age
-        gender
-        role
-        is_active
-      }
-    }
-  `);
+
   const googleHandler = async () => {
     console.error("Login");
   };
@@ -96,8 +85,8 @@ const FirebaseLogin = ({ ...others }) => {
 
       <Formik
         initialValues={{
-          email: "abc@xyz.com",
-          password: "****",
+          email: "",
+          password: "",
           submit: null,
         }}
         validationSchema={Yup.object().shape({
@@ -108,37 +97,32 @@ const FirebaseLogin = ({ ...others }) => {
           password: Yup.string().max(255).required("Password is required"),
         })}
         onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
-          try {
-            await Login_client({
-              variables: values,
-            }).then((e) => {
-              // console.log(e);
-              if (e.errors) {
+          Login(values.email, values.password)
+            .then(
+              (e) => {
+                console.log(e.data);
+                localStorage.setItem("token", e.data.data.token);
+                localStorage.setItem("role", e.data.data.user.role);
+                localStorage.setItem("user", JSON.stringify(e.data.data.user));
+                if (e.data.data.user.role == "Student") router.push("/users");
+                else if (e.data.data.user.role == "Admin")
+                  router.push("/admin");
+                else if (e.data.data.user.role == "Teacher")
+                  router.push("/admin");
+              },
+              (err) => {
+                console.log(err);
+
                 setStatus({ success: false });
-                setErrors({ submit: error?.message });
+                setErrors({ submit: err.response.data.message });
                 setSubmitting(false);
               }
-              if (e.data) {
-                console.log(e.data.login.role);
-
-                if (e.data.login.role == "Client") {
-                  router.push("/users");
-                } else {
-                  router.push("/admin");
-                }
-              }
-              localStorage.setItem("role", e.data.login.role);
-              localStorage.setItem("user", JSON.stringify(e.data.login));
+            )
+            .finally(() => {
+              setSubmitting(false);
             });
 
-            // setStatus({ success: true });
-
-            setSubmitting(false);
-          } catch (err: any) {
-            setStatus({ success: false });
-            setErrors({ submit: error?.message });
-            setSubmitting(false);
-          }
+          // setStatus({ success: true });
         }}
       >
         {({

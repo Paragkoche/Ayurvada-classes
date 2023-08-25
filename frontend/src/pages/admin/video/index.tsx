@@ -25,8 +25,8 @@ import { Typography } from "@mui/material";
 import { useTheme } from "@mui/material";
 import { IconButton } from "@mui/material";
 import { useRouter } from "next/router";
-import { URL } from "@/api";
-import React from "react";
+import { URL, Videos } from "@/api";
+import React, { useState } from "react";
 export function applyPagination(
   documents: any,
   page: number,
@@ -37,50 +37,34 @@ export function applyPagination(
 const Page = () => {
   const theme = useTheme();
   const router = useRouter();
-  const { loading, data, error, refetch } = useQuery(gql`
-    query {
-      get_all_videos {
-        id
-        title
-        photo
-        disc
-        link
-        isZoomMeet
-        isLiveNow
-        is48h
-        createAt
-      }
-    }
-  `);
+  const [error, setError] = useState<{
+    message?: string;
+  }>();
+  const [loading, setLoading] = useState<boolean>(true);
+  const [data, _setData] = useState<any[]>([]);
 
-  const [deleteVideo, { loading: lo, data: da, error: err }] = useMutation(gql`
-    mutation delete_video($id: ID) {
-      delete_video(id: $id) {
-        id
-      }
-    }
-  `);
-  const [videoName, setVideoName] = React.useState({
-    name: "",
-    id: "",
-  });
+  const [videoName, setVideoName] = React.useState<any>({ name: "" });
   React.useEffect(() => {
-    refetch();
+    Videos()
+      .then((data) => {
+        _setData(data.data.data);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, []);
   const [D, setD] = React.useState("");
   const [dd, setDd] = React.useState(false);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   React.useEffect(() => {
-    return setData(
-      applyPagination(data?.get_all_videos || [], page, rowsPerPage)
-    );
+    return setData(applyPagination(data || [], page, rowsPerPage));
   }, [page, rowsPerPage, data]);
   const handlePageChange = React.useCallback((event: any, value: any) => {
     setPage(value);
   }, []);
   const [_data, setData] = React.useState(
-    applyPagination(data?.get_all_videos || [], page, rowsPerPage)
+    applyPagination(data || [], page, rowsPerPage)
   );
   const handleRowsPerPageChange = React.useCallback((event: any) => {
     setRowsPerPage(event.target.value);
@@ -109,13 +93,6 @@ const Page = () => {
                     <Typography
                       sx={{ fontWeight: theme.typography.fontWeightBold }}
                     >
-                      ID
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography
-                      sx={{ fontWeight: theme.typography.fontWeightBold }}
-                    >
                       Title
                     </Typography>
                   </TableCell>
@@ -140,27 +117,7 @@ const Page = () => {
                       Link
                     </Typography>
                   </TableCell>
-                  <TableCell>
-                    <Typography
-                      sx={{ fontWeight: theme.typography.fontWeightBold }}
-                    >
-                      isZoomMeet
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography
-                      sx={{ fontWeight: theme.typography.fontWeightBold }}
-                    >
-                      isLiveNow
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography
-                      sx={{ fontWeight: theme.typography.fontWeightBold }}
-                    >
-                      is48h
-                    </Typography>
-                  </TableCell>
+
                   <TableCell>
                     <Typography
                       sx={{ fontWeight: theme.typography.fontWeightBold }}
@@ -188,15 +145,6 @@ const Page = () => {
                 {_data.map((v: any, i: any) => (
                   <TableRow key={i}>
                     <TableCell>
-                      <Typography
-                        flexWrap={"wrap"}
-                        sx={{ fontWeight: theme.typography.fontWeightBold }}
-                      >
-                        {v.id}
-                      </Typography>
-                    </TableCell>
-
-                    <TableCell>
                       <Typography flexWrap={"wrap"}>{v.title}</Typography>
                     </TableCell>
                     <TableCell>
@@ -212,28 +160,10 @@ const Page = () => {
                     <TableCell>
                       <Typography flexWrap={"wrap"}>{URL + v.link}</Typography>
                     </TableCell>
-                    <TableCell>
-                      <Checkbox disabled checked={v.isZoomMeet} />
-                    </TableCell>
-                    <TableCell>
-                      <Checkbox disabled checked={v.isLiveNow} />
-                    </TableCell>
-                    <TableCell>
-                      <Checkbox
-                        disabled
-                        checked={
-                          new Date(parseInt(v.is48h)).getDate() <=
-                          new Date().getDate()
-                        }
-                      />
-                    </TableCell>
+
                     <TableCell>
                       <Typography>
-                        {
-                          new Date(parseInt(v.crateAt))
-                            .toLocaleString()
-                            .split(",")[0]
-                        }
+                        {new Date(v.CrateAt).toISOString()}
                       </Typography>
                     </TableCell>
                     <TableCell>
@@ -241,10 +171,7 @@ const Page = () => {
                         color="error"
                         onClick={() => {
                           setD("Delete");
-                          setVideoName({
-                            name: v.title,
-                            id: v.id,
-                          });
+                          setVideoName(v);
                           setDd(true);
                         }}
                       >
@@ -256,10 +183,7 @@ const Page = () => {
                         color="warning"
                         onClick={() => {
                           setD("Update");
-                          setVideoName({
-                            name: v.title,
-                            id: v.id,
-                          });
+                          setVideoName(v);
                           setDd(true);
                         }}
                       >
@@ -273,7 +197,7 @@ const Page = () => {
           </TableContainer>
           <TablePagination
             component="div"
-            count={data.get_all_videos.length}
+            count={data.length}
             onPageChange={handlePageChange}
             onRowsPerPageChange={handleRowsPerPageChange}
             page={page}
@@ -291,14 +215,6 @@ const Page = () => {
               color="error"
               onClick={() => {
                 if (D == "Delete") {
-                  deleteVideo({
-                    variables: {
-                      id: videoName.id,
-                    },
-                  }).then((e) => {
-                    refetch();
-                    setDd(false);
-                  });
                 } else {
                   router.push("/admin/video/update/" + videoName.id);
                 }

@@ -117,7 +117,7 @@ export const get_list_of_class = async (
   res: Response
 ) => {
   try {
-    const classes = ClassesDb.find();
+    const classes = await ClassesDb.find();
     res.json({
       status: 200,
       data: classes,
@@ -134,7 +134,7 @@ export const get_list_of_user = async (
   res: Response
 ) => {
   try {
-    const users = UserDb.find();
+    const users = await UserDb.find();
     res.json({
       status: 200,
       data: users,
@@ -151,7 +151,7 @@ export const get_list_of_video = async (
   res: Response
 ) => {
   try {
-    const videos = VideoDb.find();
+    const videos = await VideoDb.find();
     res.json({
       status: 200,
       data: videos,
@@ -208,8 +208,9 @@ export const Add_Class = async (req: AdminTokenRequest, res: Response) => {
 };
 export const Add_Video = async (req: AdminTokenRequest, res: Response) => {
   try {
+    const id = randomUUID();
     new Promise((resolve, reject) => {
-      const stream = fs.createWriteStream("./ok.mp4");
+      const stream = fs.createWriteStream(`./video/${id}.mp4`);
       stream.on("open", () => {
         console.log("Stream open ...  0.00%");
         req.pipe(stream);
@@ -220,19 +221,21 @@ export const Add_Video = async (req: AdminTokenRequest, res: Response) => {
       });
       stream.on("close", () => {
         console.log("Processing  ...  100%");
-        resolve(`./video/${randomUUID()}.mp4`);
+        resolve(`./video/${id}.mp4`);
       });
       stream.on("drain", () => {
         const written = parseInt(stream.bytesWritten.toString());
         const total = parseInt(req.headers["content-length"]);
         const pWritten = ((written / total) * 100).toFixed(2);
-        console.log(`Processing  ...  ${pWritten}% done`);
+        // console.log(`Processing  ...  ${pWritten}% done`);
       });
     }).then(
       (path) => res.send({ status: "success", path }),
       (err) => res.send({ status: "error", err })
     );
   } catch (e) {
+    console.log(e);
+
     return res.status(500).json({
       status: 500,
       message: "Internal server error",
@@ -326,10 +329,157 @@ export const Add_update_class = async (
   res: Response
 ) => {
   try {
+    const data = req.body;
+    const update_class = await ClassesDb.update(data.classId, {
+      name: data.name,
+      pay: data.pay,
+      photo: data.photo,
+      end_on: data.end_on,
+    });
+    if (!update_class) return new Error("Class not Update");
+    return res.json({
+      status: 200,
+      data: await ClassesDb.findOne({
+        where: { id: data.classId },
+        cache: true,
+      }),
+    });
   } catch (e) {
+    console.log(e);
+
     return res.status(500).json({
       status: 500,
       message: "Internal server error",
+      error: e.toString(),
+    });
+  }
+};
+
+export const one_class = async (req: AdminTokenRequest, res: Response) => {
+  try {
+    return res.json({
+      status: 200,
+      data: await ClassesDb.findOne({
+        where: { id: req.params.id },
+        cache: true,
+      }),
+    });
+  } catch (e) {
+    console.log(e);
+
+    return res.status(500).json({
+      status: 500,
+      message: "Internal server error",
+      error: e.toString(),
+    });
+  }
+};
+export const one_user = async (req: AdminTokenRequest, res: Response) => {
+  try {
+    return res.json({
+      status: 200,
+      data: await UserDb.findOne({
+        where: { id: req.params.id },
+        cache: true,
+      }),
+    });
+  } catch (e) {
+    console.log(e);
+
+    return res.status(500).json({
+      status: 500,
+      message: "Internal server error",
+      error: e.toString(),
+    });
+  }
+};
+export const one_video = async (req: AdminTokenRequest, res: Response) => {
+  try {
+    return res.json({
+      status: 200,
+      data: await VideoDb.findOne({
+        where: { id: req.params.id },
+        cache: true,
+      }),
+    });
+  } catch (e) {
+    console.log(e);
+
+    return res.status(500).json({
+      status: 500,
+      message: "Internal server error",
+      error: e.toString(),
+    });
+  }
+};
+
+export const one_user_delete = async (
+  req: AdminTokenRequest,
+  res: Response
+) => {
+  try {
+    const delete_user = await UserDb.delete({
+      id: req.params.id,
+    });
+    if (!delete_user) return new Error("User not delete");
+    return res.json({
+      status: 200,
+      message: "User delete",
+    });
+  } catch (e) {
+    console.log(e);
+
+    return res.status(500).json({
+      status: 500,
+      message: "Internal server error",
+      error: e.toString(),
+    });
+  }
+};
+export const one_video_delete = async (
+  req: AdminTokenRequest,
+  res: Response
+) => {
+  try {
+    const delete_user = await VideoDb.delete({
+      id: req.params.id,
+    });
+    if (!delete_user) return new Error("Video not delete");
+    return res.json({
+      status: 200,
+      message: "Video delete",
+    });
+  } catch (e) {
+    console.log(e);
+
+    return res.status(500).json({
+      status: 500,
+      message: "Internal server error",
+      error: e.toString(),
+    });
+  }
+};
+
+export const one_class_delete = async (
+  req: AdminTokenRequest,
+  res: Response
+) => {
+  try {
+    const delete_user = await ClassesDb.delete({
+      id: req.params.id,
+    });
+    if (!delete_user) return new Error("Class not delete");
+    return res.json({
+      status: 200,
+      message: "Class delete",
+    });
+  } catch (e) {
+    console.log(e);
+
+    return res.status(500).json({
+      status: 500,
+      message: "Internal server error",
+      error: e.toString(),
     });
   }
 };

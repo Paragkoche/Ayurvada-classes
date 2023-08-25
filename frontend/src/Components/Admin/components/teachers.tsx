@@ -42,16 +42,18 @@ const CardWrapper = styled(MainCard)(({ theme }: any) => ({
     right: -130,
   },
 }));
-export default () => {
+export default ({
+  loading,
+  data,
+  error,
+}: {
+  loading: boolean;
+  data?: number;
+  error: { message?: string | undefined };
+}) => {
   const router = useRouter();
   const theme: any = useTheme();
-  const { loading, data, error } = useQuery(gql`
-    query {
-      get_teacher {
-        id
-      }
-    }
-  `);
+
   return loading && !data ? (
     error ? (
       <Card>
@@ -84,7 +86,7 @@ export default () => {
       </Card>
     )
   ) : (
-    data && (
+    (!data && (
       <CardWrapper
         border={false}
         content={false}
@@ -139,7 +141,7 @@ export default () => {
                       mb: 0.75,
                     }}
                   >
-                    {data.get_teacher.length}
+                    {data}
                   </Typography>
                 </Grid>
                 <Grid item></Grid>
@@ -159,6 +161,6 @@ export default () => {
           </Grid>
         </Box>
       </CardWrapper>
-    )
+    )) || <>sss</>
   );
 };

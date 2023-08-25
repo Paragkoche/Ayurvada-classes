@@ -2,30 +2,23 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  ManyToOne,
-  OneToMany,
+  JoinColumn,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
-  WithoutId,
 } from "typeorm";
-import { Video } from "./Video.entity";
 import { User } from "./Users.entity";
+
 @Entity()
-export class Classes {
+export class OTP {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
   @Column()
-  photo: string;
+  otp: string;
 
-  @Column()
-  name: string;
-
-  @Column()
-  pay: string;
-
-  @Column()
-  end_on: string;
+  @Column({ default: false })
+  isUse: boolean;
 
   @CreateDateColumn({
     type: "timestamp",
@@ -40,9 +33,7 @@ export class Classes {
   })
   UpdateAt: Date;
 
-  @OneToMany(() => Video, (video) => video.classes)
-  Videos: Video[];
-
-  @ManyToOne(() => User, (user) => user.Classes)
-  users: User;
+  @OneToOne(() => User)
+  @JoinColumn()
+  User: User;
 }

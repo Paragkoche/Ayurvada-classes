@@ -3,15 +3,18 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   JoinTable,
   ManyToMany,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
   WithoutId,
 } from "typeorm";
 import { Classes } from "./Classes.entity";
 import { genSalt, hash } from "bcrypt";
+import { OTP } from "./Otp.entity";
 @Entity()
 export class User {
   @PrimaryGeneratedColumn("uuid")
@@ -44,6 +47,7 @@ export class User {
 
   @OneToMany(() => Classes, (classes) => classes.users)
   payFor: Classes[];
+
   @CreateDateColumn({
     type: "timestamp",
     default: () => "CURRENT_TIMESTAMP(6)",

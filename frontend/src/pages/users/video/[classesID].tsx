@@ -12,29 +12,31 @@ import Layout from "../Layout";
 import { gql, useQuery } from "@apollo/client";
 import { useRouter } from "next/router";
 import MainCard from "@/Components/MainCard";
+import { useEffect, useState } from "react";
+import { getAllVideo } from "@/api";
 
 const Page = () => {
   const router = useRouter();
-  const { classessID } = router.query;
-  const { loading, data, error } = useQuery(
-    gql`
-      query get_classes_by_id($id: ID) {
-        get_classes_by_id(id: $id) {
-          lecher {
-            id
-            title
-            is48h
-            photo
-          }
+  const { classesID }: any = router.query;
+  const [error, setError] = useState<{
+    message?: string;
+  }>();
+  const [loading, setLoading] = useState<boolean>(true);
+  const [data, setData] = useState<{
+    data: any[];
+  }>();
+  useEffect(() => {
+    getAllVideo(classesID)
+      .then(
+        (data) => {
+          setData(data.data);
+        },
+        (error) => {
+          setError({ message: error.response.data.message });
         }
-      }
-    `,
-    {
-      variables: {
-        id: classessID,
-      },
-    }
-  );
+      )
+      .finally(() => setLoading(false));
+  }, []);
   return (
     <>
       {loading && !data ? (
@@ -43,7 +45,7 @@ const Page = () => {
         data && (
           <MainCard title="All Videos">
             <Box sx={{ display: "flex", flexWrap: "wrap", gap: "20px" }}>
-              {(data.get_classes_by_id.lecher as any[]).map((v: any) => (
+              {(data.data as any[]).map((v: any) => (
                 <Card sx={{ widows: "500px", cursor: "pointer" }}>
                   <CardMedia component="img" height={200} src={v.photo} />
                   <CardContent>
@@ -59,9 +61,7 @@ const Page = () => {
                   </CardActions>
                 </Card>
               ))}
-              {data.get_classes_by_id.lecher.length == 0 && (
-                <Typography>No videos</Typography>
-              )}
+              {data.data.length == 0 && <Typography>No videos</Typography>}
             </Box>
           </MainCard>
         )

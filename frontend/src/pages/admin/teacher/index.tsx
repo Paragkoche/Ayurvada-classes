@@ -22,28 +22,13 @@ import { useRouter } from "next/router";
 const Page = () => {
   const theme = useTheme();
   const router = useRouter();
-  const { loading, data, error } = useQuery(gql`
-    query {
-      get_teacher {
-        id
-        name
-        email
-        age
-        gender
-        role
-        is_active
-      }
-    }
-  `);
+
   return (
-    !loading &&
-    data && (
-      <>
-        <MainCard title="All Teachers" content={true}>
-          <Typography>Coming Soon</Typography>
-        </MainCard>
-      </>
-    )
+    <>
+      <MainCard title="All Teachers" content={true}>
+        <Typography>Coming Soon</Typography>
+      </MainCard>
+    </>
   );
 };
 Page.getLayout = (page: any) => <Layout>{page}</Layout>;

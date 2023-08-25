@@ -10,37 +10,23 @@ import {
   useTheme,
 } from "@mui/material";
 import { Formik } from "formik";
-import { Grid } from "@mui/material";
-import Yup from "yup";
-// import FileUpload from "react-mui-fileuploader";
 import React from "react";
-import FileUpload from "react-mui-fileuploader";
 import AnimateButton from "@/Components/extr/AnimateButton";
 import { gql, useMutation } from "@apollo/client";
+import FileUpload from "@/Components/FileUpload";
+import { add_class } from "@/api";
+import { useRouter } from "next/router";
 const AuthWrapper1 = styled("div")(({ theme }) => ({}));
-const FL = styled(FileUpload)(({ theme }) => ({
-  color: theme.palette.background.paper,
-}));
 
 const Page = () => {
   const [data, setData] = React.useState({
     photo: "",
     pay: "",
-    endOn: "",
+    end_on: "",
     name: "",
   });
-  const [add_class, { loading, error, data: _data }] = useMutation(gql`
-    mutation make_classes(
-      $photo: String
-      $name: String
-      $pay: String
-      $endOn: String
-    ) {
-      make_classes(photo: $photo, name: $name, pay: $pay, endOn: $endOn) {
-        id
-      }
-    }
-  `);
+  const router = useRouter();
+
   const [isSubmitting, setisSubmitting] = React.useState(false);
   const theme: any = useTheme();
   return (
@@ -51,7 +37,7 @@ const Page = () => {
             initialValues={{
               photo: "",
               pay: "",
-              endOn: "",
+              end_on: "",
               name: "",
             }}
             onSubmit={(e) => {
@@ -63,21 +49,24 @@ const Page = () => {
               onSubmit={(event) => {
                 setisSubmitting(true);
                 event.preventDefault();
-                if (!data.name || !data.endOn || !data.pay || !data.photo) {
+                if (!data.name || !data.end_on || !data.pay || !data.photo) {
                   setisSubmitting(false);
                   return alert("Data not fill properly");
                 }
                 console.log(data);
-                add_class({ variables: data })
+                add_class({ ...data })
                   .then(
-                    () => {
+                    (data) => {
+                      console.log(data.data);
+
                       setData({
                         photo: "",
                         pay: "",
-                        endOn: "",
+                        end_on: "",
                         name: "",
                       });
                       alert("class make successfully");
+                      router.push("/admin/classes");
                     },
                     (err) => {
                       alert(err.message);
@@ -106,25 +95,18 @@ const Page = () => {
                 <InputLabel>End on</InputLabel>
                 <OutlinedInput
                   type="date"
-                  value={data.endOn}
-                  onChange={(e) => setData({ ...data, endOn: e.target.value })}
+                  value={data.end_on}
+                  onChange={(e) => setData({ ...data, end_on: e.target.value })}
                 />
               </FormControl>
 
-              <FL
-                color={theme.palette.grey[100] + "!important"}
-                title="Photo"
-                header="[Drag to drop]"
-                sx={{
-                  color: theme.palette.grey[100],
-                }}
-                getBase64={true}
-                multiFile={false}
-                maxUploadFiles={1}
-                acceptedType={"image/*"}
-                onFilesChange={(e) => {
-                  if (e.length !== 0)
-                    setData((s) => ({ ...s, photo: e[0].path }));
+              <FileUpload
+                imageLink={data.photo}
+                onChange={(e) => {
+                  setData({
+                    ...data,
+                    photo: e,
+                  });
                 }}
               />
               <Box sx={{ mt: 2 }}>

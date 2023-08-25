@@ -12,10 +12,8 @@ export default function Home() {
   // const cookieStore = cookies();
   React.useEffect(() => {
     // let token = cookieStore.get("token");
-    let token = Object.fromEntries(
-      new URLSearchParams(document.cookie.replace(/; /g, "&"))
-    );
-    if (!token.token) route.push("/login");
+    let token = localStorage.getItem("token");
+    if (!token) route.push("/login");
     else {
       const role = localStorage.getItem("role");
       if (!role) route.push("/login");

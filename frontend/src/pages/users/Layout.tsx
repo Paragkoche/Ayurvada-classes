@@ -320,10 +320,6 @@ export default ({ children }: any) => {
                   <ListItemButton
                     onClick={async () => {
                       if (v.route == "/login") {
-                        await fetch(URL + "/log-out", {
-                          method: "PUT",
-                          credentials: "include",
-                        });
                         localStorage.clear();
                       }
                       router.push(v.route);
@@ -418,10 +414,6 @@ export default ({ children }: any) => {
                     <ListItemButton
                       onClick={async () => {
                         if (v.route == "/login") {
-                          await fetch(URL + "/log-out", {
-                            method: "PUT",
-                            credentials: "include",
-                          });
                           localStorage.clear();
                         }
                         router.push(v.route);

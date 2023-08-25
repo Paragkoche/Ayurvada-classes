@@ -10,38 +10,55 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { gql, useQuery } from "@apollo/client";
 import Link from "next/link";
 import Layout from "./Layout";
 import MainCard from "@/Components/MainCard";
 import AnimateButton from "@/Components/extr/AnimateButton";
 import { useRouter } from "next/router";
+import { getAllCourse, getAllCourse_you_pay } from "@/api";
 const Page = () => {
   const router = useRouter();
   const theme = useTheme();
-  const { loading, data, error } = useQuery(gql`
-    query {
-      get_all_classes {
-        id
-        name
-        photo
-        pay
+  const [error, setError] = useState<{
+    message?: string;
+  }>();
+  const [loading, setLoading] = useState<boolean>(true);
+  const [data, setData] = useState<{
+    AllClass: any[];
+    PayClass: any[];
+  }>({
+    AllClass: [],
+    PayClass: [],
+  });
+  useEffect(() => {
+    getAllCourse().then(
+      (allC) => {
+        setData((s) => ({ ...s, AllClass: JSON.parse(allC.data).data }));
+        getAllCourse_you_pay()
+          .then(
+            (AllcP) => {
+              setData((s) => ({ ...s, PayClass: JSON.parse(AllcP.data).data }));
+            },
+            (error) => {
+              setError({ message: error.response.data.message });
+            }
+          )
+          .finally(() => setLoading(false));
+      },
+      (error) => {
+        setError({ message: error.response.data.message });
       }
-      get_assess_classes {
-        id
-        name
-        photo
-      }
-    }
-  `);
+    );
+  }, []);
 
   return (
     <>
       {error ? (
         <Snackbar open autoHideDuration={5000} message={error.message} />
       ) : null}
-      {loading && !data ? (
+      {loading ? (
         <CircularProgress />
       ) : (
         data && (
@@ -53,7 +70,7 @@ const Page = () => {
               }}
             >
               <Box sx={{ display: "flex", flexWrap: "wrap", gap: "20px" }}>
-                {data.get_assess_classes.map((v: any) => (
+                {data.PayClass.map((v: any) => (
                   <Card
                     sx={{
                       border: "1px solid",
@@ -83,50 +100,41 @@ const Page = () => {
                     </CardActions>
                   </Card>
                 ))}
-                {data.get_assess_classes.length == 0 && (
+                {data.PayClass.length == 0 && (
                   <Typography>You did not purchase any classes.</Typography>
                 )}
               </Box>
             </MainCard>
             <MainCard title="All Courses">
               <Box sx={{ display: "flex", flexWrap: "wrap", gap: "20px" }}>
-                {(data.get_all_classes as any[])
-                  .filter((v) => {
-                    let a = true;
-                    data.get_assess_classes.map((vv: any) => {
-                      a = v.id !== vv.id;
-                    });
-                    return a;
-                  })
-
-                  .map((v: any) => (
-                    <Card
+                {(data.AllClass as any[]).map((v: any) => (
+                  <Card
+                    sx={{
+                      border: "1px solid",
+                      borderColor: theme.palette.primary.light,
+                      widows: "500px",
+                    }}
+                  >
+                    <CardMedia
+                      component="img"
+                      // width={200}
+                      height={200}
                       sx={{
-                        border: "1px solid",
-                        borderColor: theme.palette.primary.light,
-                        widows: "500px",
+                        objectFit: "cover",
                       }}
-                    >
-                      <CardMedia
-                        component="img"
-                        // width={200}
-                        height={200}
-                        sx={{
-                          objectFit: "cover",
-                        }}
-                        src={v.photo}
-                      />
-                      <CardContent>
-                        <Typography>{v.name}</Typography>
-                      </CardContent>
-                      <CardActions>
-                        <Button onClick={() => router.push("/pay/" + v.id)}>
-                          Buy Just {v.pay} ₹
-                        </Button>
-                      </CardActions>
-                    </Card>
-                  ))}
-                {data.get_all_classes.length == 0 && (
+                      src={v.photo}
+                    />
+                    <CardContent>
+                      <Typography>{v.name}</Typography>
+                    </CardContent>
+                    <CardActions>
+                      <Button onClick={() => router.push("/pay/" + v.id)}>
+                        Buy Just {v.pay} ₹
+                      </Button>
+                    </CardActions>
+                  </Card>
+                ))}
+                {data.AllClass.length == 0 && (
                   <Typography>No Classes</Typography>
                 )}
               </Box>

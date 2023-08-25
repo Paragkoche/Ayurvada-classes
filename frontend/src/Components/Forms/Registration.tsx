@@ -31,37 +31,13 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import AnimateButton from "../extr/AnimateButton";
 import { gql, useMutation } from "@apollo/client";
 import { useRouter } from "next/router";
+import { StudentRegister } from "@/api";
 
 const FirebaseLogin = ({ ...others }) => {
   const router = useRouter();
   const theme: any = useTheme();
-  const matchDownSM = useMediaQuery(theme.breakpoints.down("md"));
   const [checked, setChecked] = useState(true);
-  const [add_Client, { data, loading, error }] = useMutation(gql`
-    mutation make_client(
-      $name: String
-      $password: String
-      $email: String
-      $age: String
-      $gander: User_Gander
-    ) {
-      make_client(
-        name: $name
-        password: $password
-        email: $email
-        age: $age
-        gender: $gander
-      ) {
-        id
-        name
-        email
-        age
-        gender
-        role
-        is_active
-      }
-    }
-  `);
+
   const googleHandler = async () => {
     console.error("Login");
   };
@@ -82,9 +58,10 @@ const FirebaseLogin = ({ ...others }) => {
       .required(),
     name: Joi.string().max(255).required(),
     password: Joi.string().max(255).required(),
-    contantNo: Joi.string().max(255).required(),
-    age: Joi.string().max(255).required(),
-    gander: Joi.string().max(255).required(),
+    age: Joi.number().required(),
+    gender: Joi.string().max(255).required(),
+
+    submit: Joi.any(),
   });
 
   return (
@@ -119,12 +96,12 @@ const FirebaseLogin = ({ ...others }) => {
 
       <Formik
         initialValues={{
-          email: "abc@gmail.com",
-          name: "XYZ",
-          password: "...",
-          contantNo: "+91 80XXXXXXX0",
-          age: "8".toString(),
-          gander: "Male",
+          email: "",
+          name: "",
+          password: "",
+          age: 0,
+          gender: "Male",
+          submit: null,
         }}
         validate={(values) => {
           const validationResult = validationSchema.validate(values, {
@@ -142,24 +119,30 @@ const FirebaseLogin = ({ ...others }) => {
         }}
         onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
           console.log(values);
+          StudentRegister({ ...values })
+            .then(
+              (e) => {
+                console.log(e.data);
 
-          try {
-            await add_Client({
-              variables: { ...values },
-            }).then((e) => {
-              console.log(e);
+                console.log(e.data);
+                localStorage.setItem("token", e.data.token);
+                localStorage.setItem("role", e.data.data.role);
+                localStorage.setItem("user", JSON.stringify(e.data.data));
+                if (e.data.data.role == "Student") router.push("/users");
+                else if (e.data.data.role == "Admin") router.push("/admin");
+                else if (e.data.data.role == "Teacher") router.push("/admin");
+              },
+              (err) => {
+                console.log(err);
 
-              localStorage.setItem("user", JSON.stringify(e.data.Login_client));
-              router.push("/users");
+                setStatus({ success: false });
+                setErrors({ submit: err.response.data.message });
+                setSubmitting(false);
+              }
+            )
+            .finally(() => {
+              setSubmitting(false);
             });
-            setStatus({ success: true });
-            setSubmitting(false);
-          } catch (err: any) {
-            console.log(error);
-
-            setStatus({ success: false });
-            setSubmitting(false);
-          }
         }}
       >
         {({
@@ -307,7 +290,12 @@ const FirebaseLogin = ({ ...others }) => {
                 <InputLabel htmlFor="outlined-adornment-age-login">
                   Gander
                 </InputLabel>
-                <Select>
+                <Select
+                  value={values.gender}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  name="gender"
+                >
                   <MenuItem value={"Male"}>Male</MenuItem>
                   <MenuItem value={"Female"}>Female</MenuItem>
                   <MenuItem value={"Other"}>Other</MenuItem>

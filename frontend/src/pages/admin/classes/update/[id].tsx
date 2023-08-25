@@ -10,62 +10,34 @@ import {
   useTheme,
 } from "@mui/material";
 import { Formik } from "formik";
-import { Grid } from "@mui/material";
-import Yup from "yup";
-import FileUpload from "react-mui-fileuploader";
+
 import React from "react";
 import AnimateButton from "@/Components/extr/AnimateButton";
-import { gql, useMutation, useQuery } from "@apollo/client";
 import { useRouter } from "next/router";
-const FL = styled(FileUpload)(({ theme }) => ({
-  color: theme.palette.background.paper,
-}));
+import FileUpload from "@/Components/FileUpload";
+import { one_class, update_class } from "@/api";
 
 const Page = () => {
   const router = useRouter();
-  const { id } = router.query;
-  const {
-    loading: lo,
-    data: dd,
-    error: er,
-  } = useQuery(gql`
-    query {
-      get_classes_id(id: "${id}") {
-        photo
-        name
-        pay
-        endOn
-      }
-    }
-  `);
+  const { id }: any = router.query;
+
   React.useEffect(() => {
-    setData(dd);
-  }, [dd]);
-  const [data, setData] = React.useState<any>();
-  const [add_class, { loading, error, data: _data }] = useMutation(gql`
-    mutation update_classes(
-      $photo: String
-      $name: String
-      $pay: String
-      $endOn: String
-      $id: ID
-    ) {
-      update_classes(
-        id: $id
-        photo: $photo
-        name: $name
-        pay: $pay
-        endOn: $endOn
-      ) {
-        id
-      }
+    try {
+      if (id)
+        one_class(id).then(({ data }) => {
+          console.log(data);
+
+          setData(data.data);
+        });
+    } catch (e) {
+      console.log(e);
     }
-  `);
+  }, [id]);
+  const [data, setData] = React.useState<any>();
+  console.log(data);
   const [isSubmitting, setisSubmitting] = React.useState(false);
   const theme: any = useTheme();
   return (
-    !lo &&
-    dd &&
     data && (
       <>
         <MainCard>
@@ -74,7 +46,7 @@ const Page = () => {
               initialValues={{
                 photo: "",
                 pay: "",
-                endOn: "",
+                end_on: "",
                 name: "",
               }}
               onSubmit={(e) => {
@@ -86,47 +58,30 @@ const Page = () => {
                 onSubmit={(event) => {
                   setisSubmitting(true);
                   event.preventDefault();
-                  if (
-                    !data.get_classes_id.name ||
-                    !data.get_classes_id.endOn ||
-                    !data.get_classes_id.pay ||
-                    !data.get_classes_id.photo
-                  ) {
+                  if (!data.name || !data.end_on || !data.pay || !data.photo) {
                     setisSubmitting(false);
                     return alert("Data not fill properly");
                   }
-                  console.log(data);
-                  add_class({ variables: { id, ...data.get_classes_id } })
-                    .then(
-                      () => {
-                        // setData({
-                        //   id: "",
-                        //   photo: "",
-                        //   pay: "",
-                        //   endOn: "",
-                        //   name: "",
-                        // });
-                        alert("class update successfully");
-                      },
-                      (err) => {
-                        alert(err.message);
-                      }
-                    )
-                    .finally(() => {
+                  update_class({ classId: data.id, ...data }).then(
+                    (data) => {
                       setisSubmitting(false);
-                    });
+                      router.push("/admin/classes");
+                    },
+                    (err) => {
+                      alert(err.response.massage);
+                    }
+                  );
+                  console.log(data);
                 }}
               >
                 <FormControl fullWidth sx={{ ...theme.typography.customInput }}>
                   <InputLabel>Title</InputLabel>
                   <OutlinedInput
-                    value={data.get_classes_id.name}
+                    value={data.name}
                     onChange={(e) =>
                       setData({
-                        get_classes_id: {
-                          ...data.get_classes_id,
-                          name: e.target.value,
-                        },
+                        ...data,
+                        name: e.target.value,
                       })
                     }
                   />
@@ -134,13 +89,11 @@ const Page = () => {
                 <FormControl fullWidth sx={{ ...theme.typography.customInput }}>
                   <InputLabel>Price</InputLabel>
                   <OutlinedInput
-                    value={data.get_classes_id.pay}
+                    value={data.pay}
                     onChange={(e) =>
                       setData({
-                        get_classes_id: {
-                          ...data.get_classes_id,
-                          pay: e.target.value,
-                        },
+                        ...data,
+                        pay: e.target.value,
                       })
                     }
                   />
@@ -149,38 +102,24 @@ const Page = () => {
                   <InputLabel>End on</InputLabel>
                   <OutlinedInput
                     type="date"
-                    value={data.get_classes_id.endOn}
+                    value={data.end_on}
                     onChange={(e) =>
                       setData({
-                        get_classes_id: {
-                          ...data.get_classes_id,
-                          endOn: e.target.value,
-                        },
+                        ...data,
+                        end_on: e.target.value,
                       })
                     }
                   />
                 </FormControl>
 
-                <FL
-                  color={theme.palette.grey[100] + "!important"}
-                  title="Photo"
-                  header="[Drag to drop]"
-                  sx={{
-                    color: theme.palette.grey[100],
-                  }}
-                  getBase64={true}
-                  multiFile={false}
-                  maxUploadFiles={1}
-                  acceptedType={"image/*"}
-                  onFilesChange={(e) => {
-                    if (e.length !== 0)
-                      setData((s: any) => ({
-                        get_classes_id: {
-                          ...s.get_classes_id,
-                          photo: e[0].path,
-                        },
-                      }));
-                  }}
+                <FileUpload
+                  imageLink={data.photo}
+                  onChange={(e: any) =>
+                    setData({
+                      ...data,
+                      photo: e,
+                    })
+                  }
                 />
                 <Box sx={{ mt: 2 }}>
                   <AnimateButton>
