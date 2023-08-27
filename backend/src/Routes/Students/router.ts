@@ -5,8 +5,7 @@ import { StudentToken } from "@/Helpers/Token.helper";
 const router = Router();
 
 router.post("/register", validation.UserRegistration, controller.register);
-router.post("/send-otp");
-router.post("/verify-otp", validation.Otp_validated);
+router.post("/verify-otp", validation.Otp_validated, controller.verify_otp);
 router.get("/your-pay-course", StudentToken, controller.your_course);
 router.get("/all-classes", StudentToken, controller.all_course);
 router.get("/get-all-video/:id", StudentToken, controller.get_all_video);

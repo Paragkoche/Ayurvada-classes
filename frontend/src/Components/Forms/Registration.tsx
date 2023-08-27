@@ -125,12 +125,8 @@ const FirebaseLogin = ({ ...others }) => {
                 console.log(e.data);
 
                 console.log(e.data);
-                localStorage.setItem("token", e.data.token);
-                localStorage.setItem("role", e.data.data.role);
-                localStorage.setItem("user", JSON.stringify(e.data.data));
-                if (e.data.data.role == "Student") router.push("/users");
-                else if (e.data.data.role == "Admin") router.push("/admin");
-                else if (e.data.data.role == "Teacher") router.push("/admin");
+                localStorage.setItem("email", values.email);
+                router.push("/otp");
               },
               (err) => {
                 console.log(err);

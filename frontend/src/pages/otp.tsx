@@ -1,6 +1,6 @@
 import MainCard from "@/Components/MainCard";
 import AnimateButton from "@/Components/extr/AnimateButton";
-import { URL } from "@/api";
+import { URL, send_otp } from "@/api";
 import {
   Box,
   Button,
@@ -20,9 +20,10 @@ import {
 import axios from "axios";
 import { MuiOtpInput } from "mui-one-time-password-input";
 import { useRouter } from "next/router";
-import React from "react";
+import React, { useEffect } from "react";
 import markLogo from "../images/Mediamodifier-Design.svg";
 import Image from "next/image";
+import { Value } from "sass";
 const AuthWrapper1 = styled("div")(({ theme }) => ({
   backgroundColor: theme.palette.primary.light,
   minHeight: "100vh",
@@ -33,7 +34,10 @@ export default () => {
   const [otp, setOtp] = React.useState("");
   const [error, setError] = React.useState("");
   const [dis, setDis] = React.useState(false);
-
+  const [email, setEmail] = React.useState("");
+  useEffect(() => {
+    setEmail(localStorage.getItem("email") || "");
+  }, []);
   console.log(otp);
   const router = useRouter();
 
@@ -73,7 +77,11 @@ export default () => {
                   >
                     <Grid item sx={{ mb: 3 }}>
                       <Link href={"/"}>
-                        <Image style={{width: '100%',height: '100px'}} src={markLogo} alt="logo" />
+                        <Image
+                          style={{ width: "100%", height: "100px" }}
+                          src={markLogo}
+                          alt="logo"
+                        />
                       </Link>
                     </Grid>
                     <Grid item xs={12}>
@@ -114,16 +122,26 @@ export default () => {
                       <form
                         onSubmit={(e) => {
                           e.preventDefault();
-                          axios
-                            .put(URL + "/otp", {
-                              email: sessionStorage.getItem("email"),
-                              otp,
-                            })
+                          send_otp({ email: email, otp })
                             .then(
                               ({ data }) => {
-                                alert(data.message);
+                                console.log(data.data);
+
+                                alert(data);
                                 setOtp("");
-                                router.push("/password");
+                                localStorage.setItem("token", data.token);
+                                localStorage.setItem("role", data.data.role);
+                                localStorage.setItem(
+                                  "user",
+                                  JSON.stringify(data.data)
+                                );
+                                if (data.data.role == "Student")
+                                  router.push("/users");
+                                else if (data.data.role == "Admin")
+                                  router.push("/admin");
+                                else if (data.data.role == "Teacher")
+                                  router.push("/admin");
+                                // router.push("/student");
                               },
                               (e) => {
                                 alert(e.message);

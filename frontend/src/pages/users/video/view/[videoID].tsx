@@ -6,40 +6,57 @@ import {
   CardHeader,
   CircularProgress,
   Card,
+  Stack,
+  IconButton,
+  CardActionArea,
+  Divider,
+  FormControl,
+  OutlinedInput,
+  InputAdornment,
+  InputLabel,
 } from "@mui/material";
 import { useRouter } from "next/router";
-import { gql, useQuery } from "@apollo/client";
-import { makeStyles } from "@mui/material";
 import Layout from "../../Layout";
 import Plyr, { APITypes } from "plyr-react";
 import "plyr-react/plyr.css";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CardContent } from "@mui/joy";
-import { URL } from "@/api";
-
+import { URL, getVideo, post_video_command } from "@/api";
+import {
+  BorderBottom,
+  DocumentScanner,
+  Pageview,
+  Send,
+} from "@mui/icons-material";
+import { FavoriteBorder } from "@mui/icons-material";
+import Comment from "@/Components/Commend";
 const Page = () => {
   const router = useRouter();
   const ref = useRef<APITypes>(null);
   const { videoID } = router.query;
-  const { loading, data, error } = useQuery(
-    gql`
-      query get_video($id: ID) {
-        get_video(id: $id) {
-          id
-          title
-          photo
-          disc
-          link
-          isZoomMeet
-        }
-      }
-    `,
-    {
-      variables: {
-        id: videoID,
-      },
-    }
-  );
+  const [error, setError] = useState<{
+    message?: string;
+  }>();
+  const [loading, setLoading] = useState<boolean>(true);
+  const [data, setData] = useState<{
+    data: any;
+  }>();
+  useEffect(() => {
+    if (videoID)
+      getVideo(videoID as string)
+        .then(
+          (data) => {
+            setData(JSON.parse(data.data));
+          },
+          (error) => {
+            setError({ message: error.response.data.message });
+          }
+        )
+        .finally(() => setLoading(false));
+  }, [videoID]);
+  const [comment, setComment] = useState<string>("");
+  console.log(data);
+  const formatter = Intl.NumberFormat("en", { notation: "compact" });
   return (
     <>
       {loading || !data ? (
@@ -56,34 +73,107 @@ const Page = () => {
             }}
           >
             <Card>
+              <CardMedia>
+                <Plyr
+                  ref={ref}
+                  source={{
+                    type: "video",
+                    poster: data.data.photo,
+                    sources: [
+                      {
+                        src: `${URL}/${(data.data.link as string).replace(
+                          " ",
+                          ""
+                        )}`,
+                        provider: "html5",
+                      },
+                    ],
+                  }}
+                />
+              </CardMedia>
               <CardContent>
-                {data.get_video.isZoomMeet ? (
-                  <iframe
-                    style={{
-                      outline: "none",
-                      border: "none",
-                      width: "100%",
-                      height: "100%",
-                    }}
-                    allow="camera; microphone"
-                    src={data.get_video.link}
-                  ></iframe>
-                ) : (
-                  <Plyr
-                    ref={ref}
-                    source={{
-                      type: "video",
-                      poster: data.get_video.photo,
-                      sources: [
-                        {
-                          src: URL + data.get_video.link,
-                          provider: "html5",
-                        },
-                      ],
-                    }}
-                  />
-                )}
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  justifyContent="space-between"
+                  spacing={20}
+                  padding={5}
+                >
+                  <Typography variant="h2">{data.data.title}</Typography>
+                  <Stack
+                    direction="row"
+                    alignItems="center"
+                    justifyContent="space-between"
+                    spacing={2}
+                  >
+                    <Stack
+                      direction="row"
+                      alignItems="center"
+                      justifyContent="space-between"
+                      spacing={2}
+                    >
+                      <IconButton>
+                        <FavoriteBorder />
+                      </IconButton>
+                      {formatter.format(data.data.Likes.length)}
+                    </Stack>
+                    <Stack
+                      direction="row"
+                      alignItems="center"
+                      justifyContent="space-between"
+                      spacing={2}
+                    >
+                      <IconButton>
+                        <Pageview />
+                      </IconButton>
+                    </Stack>
+                  </Stack>
+                </Stack>
               </CardContent>
+              <Divider />
+              <Container sx={{ py: 2 }}>
+                <Stack direction="column" spacing={5} padding={5}>
+                  <Typography>Commend</Typography>
+                  <FormControl>
+                    <InputLabel>Comment</InputLabel>
+                    <OutlinedInput
+                      multiline
+                      label="Comment"
+                      value={comment}
+                      onChange={(e) => setComment(e.target.value)}
+                      endAdornment={
+                        <InputAdornment position="end">
+                          <IconButton
+                            onClick={() => {
+                              post_video_command(data.data.id, comment).then(
+                                () => {
+                                  getVideo(videoID as string).then(
+                                    (data) => {
+                                      setData(JSON.parse(data.data));
+                                    },
+                                    (error) => {
+                                      setError({
+                                        message: error.response.data.message,
+                                      });
+                                    }
+                                  );
+                                }
+                              );
+                            }}
+                          >
+                            <Send />
+                          </IconButton>
+                        </InputAdornment>
+                      }
+                    ></OutlinedInput>
+                  </FormControl>
+                </Stack>
+                <Divider />
+                {data.data.Comments.map((v: any) => (
+                  <Comment key={v.id} comment={v} />
+                ))}
+              </Container>
+              <Divider />
             </Card>
           </Container>
         )

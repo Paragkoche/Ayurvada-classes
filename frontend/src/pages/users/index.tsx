@@ -52,6 +52,7 @@ const Page = () => {
       }
     );
   }, []);
+  console.log(data);
 
   return (
     <>
@@ -86,14 +87,19 @@ const Page = () => {
                       sx={{
                         objectFit: "cover",
                       }}
-                      src={v.photo}
+                      src={v.class.photo}
                     />
                     <CardContent>
-                      <Typography>{v.name}</Typography>
+                      <Typography>
+                        {v.class.name} - End on{" "}
+                        {new Date(v.endAt).toDateString()}
+                      </Typography>
                     </CardContent>
                     <CardActions>
                       <Button
-                        onClick={() => router.push("/users/video/" + v.id)}
+                        onClick={() =>
+                          router.push("/users/video/" + v.class.id)
+                        }
                       >
                         Watch Video
                       </Button>
@@ -125,10 +131,13 @@ const Page = () => {
                       src={v.photo}
                     />
                     <CardContent>
-                      <Typography>{v.name}</Typography>
+                      <Typography>
+                        {v.name} - Duration "
+                        {(v.end_on as string).replace("d", " Days")}"
+                      </Typography>
                     </CardContent>
                     <CardActions>
-                      <Button onClick={() => router.push("/pay/" + v.id)}>
+                      <Button onClick={() => router.push("/pay/" + v.class.id)}>
                         Buy Just {v.pay} ₹
                       </Button>
                     </CardActions>

@@ -86,7 +86,7 @@ export default ({
       </Card>
     )
   ) : (
-    (data && (
+    ((data || data == 0) && (
       <CardWrapper
         border={false}
         content={false}

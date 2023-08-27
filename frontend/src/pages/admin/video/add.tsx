@@ -13,12 +13,12 @@ import {
   Stack,
   useMediaQuery,
 } from "@mui/material";
-import React from "react";
+import React, { useEffect } from "react";
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { useTheme } from "@emotion/react";
 import FileUpload from "@/Components/FileUpload";
 import AnimateButton from "@/Components/extr/AnimateButton";
-import { URL } from "@/api";
+import { Classes, URL, add_video_data } from "@/api";
 import VideoUpload from "@/Components/VideoUpload";
 
 const Page = () => {
@@ -30,23 +30,15 @@ const Page = () => {
     photo: "",
     disc: "",
 
-    link: null,
+    link: "",
   });
   const [dis, setDis] = React.useState(false);
-
-  function consume(stream: any, total = 0) {
-    while (stream.state === "readable") {
-      var data = stream.read();
-      total += data.byteLength;
-      console.log(
-        "received " + data.byteLength + " bytes (" + total + " bytes in total)."
-      );
-    }
-    if (stream.state === "waiting") {
-      stream.ready.then(() => consume(stream, total));
-    }
-    return stream.closed;
-  }
+  const [classes, setClasses] = React.useState([]);
+  useEffect(() => {
+    Classes().then(({ data }) => {
+      setClasses(data.data.map((v: any) => ({ name: v.name, id: v.id })));
+    });
+  }, []);
   return (
     <>
       <MainCard title="Add Video">
@@ -54,6 +46,9 @@ const Page = () => {
           <form
             onSubmit={(e) => {
               e.preventDefault();
+              add_video_data(data).then(({ data }) => {
+                console.log(data);
+              });
               setDis(true);
             }}
           >
@@ -65,10 +60,10 @@ const Page = () => {
                   setData((s) => ({ ...s, class: e.target.value }))
                 }
               >
-                {/* {_data &&
-                  _data.get_all_classes.map((v: any) => (
+                {classes &&
+                  classes.map((v: any) => (
                     <MenuItem value={v.id}>{v.name}</MenuItem>
-                  ))} */}
+                  ))}
               </Select>
             </FormControl>
             <FormControl fullWidth sx={{ ...theme.typography.customInput }}>
@@ -99,6 +94,7 @@ const Page = () => {
             <br />
             <VideoUpload
               onChange={(e) => {
+                setData((s) => ({ ...s, link: e }));
                 console.log(e);
               }}
             />

@@ -42,11 +42,27 @@ export const getVideo = (VideoId: string) => {
 export const post_video_like = (VideoId: string) => {
   return Token_axios().post(`${student_route}/video/like/${VideoId}`);
 };
-export const post_video_command = (VideoId: string) => {
-  return Token_axios().post(`${student_route}/video/comment/${VideoId}`);
+export const post_video_command = (VideoId: string, message: string) => {
+  return Token_axios().post(
+    `${student_route}/video/comment/${VideoId}`,
+    JSON.stringify({
+      message,
+    })
+  );
 };
-export const post_video_command_of_command = (VideoId: string) => {
-  return Token_axios().post(`${student_route}/comment/comment/${VideoId}`);
+export const post_video_command_of_command = (
+  VideoId: string,
+  message: string
+) => {
+  return Token_axios().post(
+    `${student_route}/comment/comment/${VideoId}`,
+    JSON.stringify({
+      message,
+    })
+  );
+};
+export const send_otp = (data: { email: string; otp: string }) => {
+  return axios.post(`${student_route}/verify-otp`, data);
 };
 // =========================(--STUDENT APIS--)============================================
 

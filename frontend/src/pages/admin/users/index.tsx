@@ -21,6 +21,12 @@ import {
   TableHead,
   TableRow,
   TablePagination,
+  Stack,
+  Container,
+  Grid,
+  OutlinedInput,
+  FormControl,
+  InputLabel,
 } from "@mui/material";
 import { Table } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
@@ -31,12 +37,15 @@ import {
   TableChart,
   TableRows,
   Update,
+  Search,
 } from "@mui/icons-material";
 import { Typography } from "@mui/material";
 import { useTheme } from "@mui/material";
-import { IconButton } from "@mui/material";
+import { IconButton, InputAdornment } from "@mui/material";
 import { useRouter } from "next/router";
 import React from "react";
+import { Users } from "@/api";
+import AnimateButton from "@/Components/extr/AnimateButton";
 export function applyPagination(
   documents: any,
   page: number,
@@ -53,38 +62,27 @@ const Page = () => {
   const theme = useTheme();
   const router = useRouter();
   const [dialog, setDialog] = React.useState(false);
-  const [seleteName, setSelectedName] = React.useState({
-    name: "",
-    id: "",
-  });
+  const [loading, setLoading] = React.useState<boolean>(true);
+  const [seleteName, setSelectedName] = React.useState<any>({ name: "" });
   const [D, setD] = React.useState("");
-  const { loading, data, error, refetch } = useQuery(gql`
-    query {
-      get_client {
-        id
-        name
-        email
-        age
-        gender
-        role
-        is_active
-      }
-    }
-  `);
+  const [data, _setData] = React.useState<any[]>([]);
+
+  React.useEffect(() => {
+    Users()
+      .then((data) => {
+        _setData(data.data.data);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
 
   const [_data, setData] = React.useState(
-    applyPagination(data?.get_client || [], page, rowsPerPage)
+    applyPagination(data || [], page, rowsPerPage)
   );
   React.useEffect(() => {
-    return setData(applyPagination(data?.get_client || [], page, rowsPerPage));
+    return setData(applyPagination(data || [], page, rowsPerPage));
   }, [page, rowsPerPage, data]);
-  const [deleteStudent, { loading: loo, data: d, error: er }] = useMutation(gql`
-    mutation delete_client($id: ID) {
-      delete_client(id: $id) {
-        id
-      }
-    }
-  `);
 
   const handlePageChange = React.useCallback((event: any, value: any) => {
     setPage(value);
@@ -112,17 +110,51 @@ const Page = () => {
           title="All Students"
           content={true}
         >
+          <Stack
+            direction="row"
+            alignItems="center"
+            justifyContent="space-between"
+            spacing={1}
+          >
+            <Stack>
+              <FormControl>
+                <InputLabel>Search</InputLabel>
+                <OutlinedInput
+                  label="Search"
+                  endAdornment={
+                    <InputAdornment position="end">
+                      <IconButton>
+                        <Search />
+                      </IconButton>
+                    </InputAdornment>
+                  }
+                  placeholder="name:<name of student>"
+                  fullWidth={false}
+                ></OutlinedInput>
+              </FormControl>
+            </Stack>
+
+            <Stack>
+              {["All"].map((v) => (
+                <AnimateButton>
+                  <Button
+                    disableElevation
+                    size="large"
+                    type="submit"
+                    variant="contained"
+                    color="secondary"
+                  >
+                    {v}
+                  </Button>
+                </AnimateButton>
+              ))}
+            </Stack>
+          </Stack>
+
           <TableContainer>
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>
-                    <Typography
-                      sx={{ fontWeight: theme.typography.fontWeightBold }}
-                    >
-                      ID
-                    </Typography>
-                  </TableCell>
                   <TableCell>
                     <Typography
                       sx={{ fontWeight: theme.typography.fontWeightBold }}
@@ -179,15 +211,6 @@ const Page = () => {
                 {_data.map((v: any) => (
                   <TableRow>
                     <TableCell>
-                      <Typography
-                        flexWrap={"wrap"}
-                        sx={{ fontWeight: theme.typography.fontWeightBold }}
-                      >
-                        {v.id}
-                      </Typography>
-                    </TableCell>
-
-                    <TableCell>
                       <Typography flexWrap={"wrap"}>{v.name}</Typography>
                     </TableCell>
 
@@ -241,7 +264,7 @@ const Page = () => {
           </TableContainer>
           <TablePagination
             component="div"
-            count={data.get_client.length}
+            count={data.length}
             onPageChange={handlePageChange}
             onRowsPerPageChange={handleRowsPerPageChange}
             page={page}
@@ -261,14 +284,6 @@ const Page = () => {
                 console.log(D);
 
                 if (D == "Delete") {
-                  deleteStudent({
-                    variables: {
-                      id: seleteName.id,
-                    },
-                  }).then((e) => {
-                    setDialog(false);
-                    refetch();
-                  });
                 } else {
                   router.push("/admin/users/update/" + seleteName.id);
                 }

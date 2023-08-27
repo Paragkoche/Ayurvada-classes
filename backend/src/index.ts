@@ -8,7 +8,7 @@ app.use(
     limit: "50GB",
   })
 );
-app.use("/video", express.static("./video"));
+app.use("/v1/video", express.static("./video"));
 app.use(Cors());
 
 app.use("/v1", AllRoutes);

@@ -1,6 +1,6 @@
 import db from "@/Database";
 import { Classes } from "@/Database/Entity/Classes.entity";
-import { User } from "@/Database/Entity/Users.entity";
+import { PayFor, User } from "@/Database/Entity/Users.entity";
 import { Comment, Like, Video } from "@/Database/Entity/Video.entity";
 import { password_compare } from "@/Helpers/Password.helper";
 import { makeToken } from "@/Helpers/Token.helper";
@@ -12,6 +12,7 @@ import {
 import { send_otp as send_otp_ } from "@/Helpers/Email.helper";
 import { Request, Response } from "express";
 import { OTP } from "@/Database/Entity/Otp.entity";
+import { MoreThan } from "typeorm";
 
 const UserDb = db.getRepository(User);
 const ClassesDb = db.getRepository(Classes);
@@ -19,6 +20,7 @@ const CommentDb = db.getRepository(Comment);
 const VideoDb = db.getRepository(Video);
 const LikeDb = db.getRepository(Like);
 const otpDb = db.getRepository(OTP);
+const PayForDb = db.getRepository(PayFor);
 export const register = async (req: Request, res: Response) => {
   try {
     const data: StudentInput = req.body;
@@ -29,25 +31,7 @@ export const register = async (req: Request, res: Response) => {
         role: "Student",
       })
     );
-
-    // const token = makeToken({ id: data_user.id });
-    return res.json({
-      status: 200,
-      message: "user registered",
-      // data: data_user,
-      // token,
-    });
-  } catch (e) {
-    return res.status(500).json({
-      status: 500,
-      message: "Internal server error",
-    });
-  }
-};
-export const send_otp = (req: Request, res: Response) => {
-  try {
-    const { email } = req.body;
-    send_otp_(email).then(
+    send_otp_(data.email).then(
       () => {
         return res.json({
           status: 200,
@@ -78,6 +62,9 @@ export const verify_otp = async (req: Request, res: Response) => {
           email,
         },
       },
+      relations: {
+        User: true,
+      },
     });
     if (!otp_DB)
       return res.status(401).json({
@@ -92,6 +79,8 @@ export const verify_otp = async (req: Request, res: Response) => {
     const update_otpDB = otpDb.update(otp_DB.id, {
       isUse: true,
     });
+    console.log(otp_DB.User);
+
     const token = makeToken({ id: otp_DB.User.id });
     return res.json({
       status: 200,
@@ -99,6 +88,8 @@ export const verify_otp = async (req: Request, res: Response) => {
       token,
     });
   } catch (e) {
+    console.log(e);
+
     return res.status(500).json({
       status: 500,
       message: "Internal server error",
@@ -137,19 +128,21 @@ export const Login = async (req: Request, res: Response) => {
 
 export const your_course = async (req: StudentTokenRequest, res: Response) => {
   try {
-    const classes = await UserDb.find({
+    const classes = await PayForDb.find({
       where: {
-        id: req.studentData.id,
+        user: {
+          id: req.studentData.id,
+        },
+        endAt: MoreThan(new Date()),
       },
       relations: {
-        payFor: true,
+        class: true,
       },
-      cache: true,
     });
 
     res.json({
       status: 200,
-      data: classes[0].payFor,
+      data: classes,
     });
   } catch (e) {
     return res.status(500).json({
@@ -192,18 +185,24 @@ export const get_all_video = async (
 ) => {
   try {
     const { id } = req.params;
-    const classes = await ClassesDb.find({
+    const classes = await PayForDb.find({
       where: {
-        id,
-        users: {
+        class: {
+          id,
+        },
+        user: {
           id: req.studentData.id,
         },
       },
 
       relations: {
-        Videos: true,
+        class: {
+          Videos: true,
+        },
       },
     });
+    console.log(classes);
+
     if (classes.length == 0)
       return res.status(201).json({
         status: 201,
@@ -212,7 +211,7 @@ export const get_all_video = async (
       });
     return res.json({
       status: 200,
-      data: classes[0].Videos,
+      data: classes[0].class.Videos,
     });
   } catch (e) {
     return res.status(500).json({
@@ -225,7 +224,27 @@ export const get_all_video = async (
 export const get_video = async (req: StudentTokenRequest, res: Response) => {
   try {
     const { id } = req.params;
-    const video = VideoDb.findOneBy({ id });
+    const video = await VideoDb.findOne({
+      where: { id },
+
+      relations: {
+        Comments: {
+          Comment_of_Comment: {
+            Comment_of_Comment: {
+              Comment_of_Comment: {
+                Comment_of_Comment: true,
+                user: true,
+              },
+              user: true,
+            },
+            user: true,
+          },
+
+          user: true,
+        },
+        Likes: true,
+      },
+    });
     if (!video)
       res.status(201).json({
         status: 201,
@@ -289,13 +308,17 @@ export const add_comment_video = async (
 ) => {
   try {
     const { message } = req.body;
-    const video = await VideoDb.find({
+    const video = await VideoDb.findOne({
       where: { id: req.params.id },
       relations: {
-        Comments: true,
+        Comments: {
+          Comment_of_comment_rle: true,
+        },
       },
     });
-    if (video.length === 0)
+    console.log(video);
+
+    if (!video)
       return res.status(404).json({
         status: 404,
         message: "Video not find",
@@ -303,19 +326,27 @@ export const add_comment_video = async (
 
     const data = await CommentDb.save(
       CommentDb.create({
-        user: req.studentData,
         comment: message,
+        video: video,
+        user: req.studentData,
       })
     );
-    const update_video = await VideoDb.update(video[0].id, {
-      Comments: [...video[0].Comments, data],
-    });
-    if (!update_video) return new Error("Comment not add");
+    // const user = await UserDb.findOne({
+    //   where: { id: req.studentData.id },
+    //   relations: { comments: true },
+    // });
+    // const update_user = await UserDb.update(req.studentData.id, {
+    //   comments: [...user.comments, data],
+    // });
+
     return res.json({
       status: 200,
       data,
     });
   } catch (e) {
+    // throw e;
+    console.log(e);
+
     return res.status(500).json({
       status: 500,
       message: "Internal server error",
@@ -327,15 +358,16 @@ export const add_comment = async (req: StudentTokenRequest, res: Response) => {
   try {
     const { message } = req.body;
     const { id } = req.params;
-    const comment = await CommentDb.find({
+    const comment = await CommentDb.findOne({
       where: {
         id,
       },
       relations: {
-        Comment_of_Comment: true,
+        Comment_of_comment_rle: true,
+        video: true,
       },
     });
-    if (comment.length == 0)
+    if (!comment)
       return res.status(404).json({
         status: 404,
         message: "Comment not font",
@@ -343,24 +375,21 @@ export const add_comment = async (req: StudentTokenRequest, res: Response) => {
     const comment_create = await CommentDb.save(
       CommentDb.create({
         comment: message,
-        user: { id: req.studentData.id },
+        Comment_of_comment_rle: comment,
       })
     );
-    if (!comment_create) return new Error("Comment not create");
-
-    const update_ = await CommentDb.update(comment[0].id, {
-      Comment_of_Comment: [...comment[0].Comment_of_Comment],
-    });
-    if (!update_) return new Error("Comment not create");
 
     return res.json({
       status: 200,
       data: comment_create,
     });
   } catch (e) {
+    throw e;
+
     return res.status(500).json({
       status: 500,
       message: "Internal server error",
+      error: e.toString(),
     });
   }
 };

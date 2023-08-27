@@ -26,17 +26,20 @@ const Page = () => {
     data: any[];
   }>();
   useEffect(() => {
-    getAllVideo(classesID)
-      .then(
-        (data) => {
-          setData(data.data);
-        },
-        (error) => {
-          setError({ message: error.response.data.message });
-        }
-      )
-      .finally(() => setLoading(false));
-  }, []);
+    if (classesID)
+      getAllVideo(classesID)
+        .then(
+          (data) => {
+            setData(JSON.parse(data.data));
+          },
+          (error) => {
+            setError({ message: error.response.data.message });
+          }
+        )
+        .finally(() => setLoading(false));
+  }, [classesID]);
+  console.log(data);
+
   return (
     <>
       {loading && !data ? (

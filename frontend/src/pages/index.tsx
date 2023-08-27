@@ -4,6 +4,7 @@ import { Inter } from "next/font/google";
 import { useRouter } from "next/router";
 import { cookies } from "next/headers";
 import React from "react";
+import { CircularProgress, Stack } from "@mui/material";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,9 +18,18 @@ export default function Home() {
     else {
       const role = localStorage.getItem("role");
       if (!role) route.push("/login");
-      else if (role == "Client") route.push("/users");
+      else if (role == "Student") route.push("/users");
       else route.push("/admin");
     }
   }, []);
-  return <></>;
+  return (
+    <Stack
+      width={"100vw"}
+      height={"100vh"}
+      alignContent={"center"}
+      justifyContent={"center"}
+    >
+      <CircularProgress />
+    </Stack>
+  );
 }

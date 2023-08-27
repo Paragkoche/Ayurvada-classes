@@ -1,13 +1,16 @@
 import db from "@/Database";
 import { Classes } from "@/Database/Entity/Classes.entity";
-import { User } from "@/Database/Entity/Users.entity";
+import { PayFor, User } from "@/Database/Entity/Users.entity";
 import { Comment, Like, Video } from "@/Database/Entity/Video.entity";
 import { AdminTokenRequest } from "@/types/Admin";
 import { StudentInput } from "@/types/Student";
 import { Response } from "express";
 import { randomUUID } from "crypto";
+import moment from "moment";
+
 import fs from "fs";
 import disk from "diskusage";
+import { calculateExpiredDate } from "@/Helpers/Date-time.helper";
 function formatBytes(bytes, decimals = 2) {
   if (!+bytes) return "0 Bytes";
 
@@ -34,7 +37,7 @@ const ClassesDb = db.getRepository(Classes);
 const CommentDb = db.getRepository(Comment);
 const VideoDb = db.getRepository(Video);
 const LikeDb = db.getRepository(Like);
-
+const PayForDB = db.getRepository(PayFor);
 export const Home = async (req: AdminTokenRequest, res: Response) => {
   try {
     const formtter = new Intl.NumberFormat("en", {
@@ -134,7 +137,23 @@ export const get_list_of_user = async (
   res: Response
 ) => {
   try {
-    const users = await UserDb.find();
+    const users = await UserDb.find({
+      where: {
+        role: "Student",
+      },
+      relations: {
+        payFor: true,
+      },
+      select: {
+        payFor: {
+          class: {
+            name: true,
+            end_on: true,
+          },
+          joinAt: true,
+        },
+      },
+    });
     res.json({
       status: 200,
       data: users,
@@ -246,8 +265,15 @@ export const Add_Video_db = async (req: AdminTokenRequest, res: Response) => {
   try {
     const data = req.body;
     const new_video = await VideoDb.save(
-      ClassesDb.create({
-        ...data,
+      VideoDb.create({
+        // ...data,
+        title: data.title,
+        photo: data.photo,
+        link: data.link,
+        disc: data.disc,
+        classes: {
+          id: data.class,
+        },
       })
     );
     return res.json({
@@ -271,15 +297,30 @@ export const Add_user_in_class = async (
       where: { id: classId },
       cache: true,
     });
+    if (!class_data)
+      return res.status(401).json({
+        status: 401,
+        message: "Class not found",
+      });
     const user_data = await UserDb.findOne({
-      where: { id: userId },
+      where: { id: userId, role: "Student" },
       relations: { payFor: true },
       cache: true,
     });
-    const update_user = UserDb.update(userId, {
-      payFor: [...user_data.payFor, class_data],
-    });
-    if (!update_user) return new Error("User not add in class ");
+    if (!user_data)
+      return res.status(401).json({
+        status: 401,
+        message: "User not found or use not student",
+      });
+    const _payFor = await PayForDB.save(
+      PayForDB.create({
+        class: class_data,
+        endAt: calculateExpiredDate(class_data.end_on),
+        user: user_data,
+      })
+    );
+    console.log(_payFor, [...user_data.payFor, _payFor]);
+
     return res.json({
       status: 200,
       data: "ok",

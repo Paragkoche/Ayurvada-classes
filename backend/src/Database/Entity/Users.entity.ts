@@ -6,6 +6,7 @@ import {
   JoinColumn,
   JoinTable,
   ManyToMany,
+  ManyToOne,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -15,6 +16,7 @@ import {
 import { Classes } from "./Classes.entity";
 import { genSalt, hash } from "bcrypt";
 import { OTP } from "./Otp.entity";
+import { Comment } from "./Video.entity";
 @Entity()
 export class User {
   @PrimaryGeneratedColumn("uuid")
@@ -45,9 +47,11 @@ export class User {
   @JoinTable()
   Classes: Classes[];
 
-  @OneToMany(() => Classes, (classes) => classes.users)
-  payFor: Classes[];
+  @OneToMany(() => PayFor, (pfor) => pfor.user)
+  payFor: PayFor[];
 
+  @OneToMany(() => Comment, (comment) => comment.user)
+  comments: Comment[];
   @CreateDateColumn({
     type: "timestamp",
     default: () => "CURRENT_TIMESTAMP(6)",
@@ -68,4 +72,25 @@ export class User {
     let _hash = await hash(_password, getSalt);
     this.password = _hash;
   }
+}
+
+@Entity()
+export class PayFor {
+  @PrimaryGeneratedColumn("uuid")
+  id: string;
+
+  @ManyToOne(() => User, (user) => user.payFor)
+  user: User;
+
+  @OneToOne(() => Classes)
+  @JoinColumn()
+  class: Classes;
+
+  @Column("timestamp", {
+    default: () => "CURRENT_TIMESTAMP(6)",
+  })
+  joinAt: Date;
+
+  @Column("timestamp")
+  endAt: Date;
 }

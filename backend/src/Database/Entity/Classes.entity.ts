@@ -9,7 +9,7 @@ import {
   WithoutId,
 } from "typeorm";
 import { Video } from "./Video.entity";
-import { User } from "./Users.entity";
+import { PayFor, User } from "./Users.entity";
 @Entity()
 export class Classes {
   @PrimaryGeneratedColumn("uuid")
@@ -26,7 +26,8 @@ export class Classes {
 
   @Column()
   end_on: string;
-
+  @Column()
+  doc_link: string;
   @CreateDateColumn({
     type: "timestamp",
     default: () => "CURRENT_TIMESTAMP(6)",

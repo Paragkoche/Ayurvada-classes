@@ -50,117 +50,119 @@ export default ({
   loading: boolean;
   data?: number;
   error: { message?: string | undefined };
-}) => {
+}): JSX.Element => {
   const router = useRouter();
   const theme: any = useTheme();
 
-  return loading && !data ? (
-    error ? (
-      <Card>
-        <CardContent>
-          <Typography>{error.message}</Typography>
-        </CardContent>
-      </Card>
+  return (
+    (loading && !data ? (
+      error ? (
+        <Card>
+          <CardContent>
+            <Typography>{error.message}</Typography>
+          </CardContent>
+        </Card>
+      ) : (
+        <Card>
+          <CardContent>
+            <Grid container direction="column">
+              <Grid item>
+                <Grid container justifyContent="space-between">
+                  <Grid item>
+                    <Skeleton variant="rectangular" width={44} height={44} />
+                  </Grid>
+                  <Grid item>
+                    <Skeleton variant="rectangular" width={34} height={34} />
+                  </Grid>
+                </Grid>
+              </Grid>
+              <Grid item>
+                <Skeleton variant="rectangular" sx={{ my: 2 }} height={40} />
+              </Grid>
+              <Grid item>
+                <Skeleton variant="rectangular" height={30} />
+              </Grid>
+            </Grid>
+          </CardContent>
+        </Card>
+      )
     ) : (
-      <Card>
-        <CardContent>
-          <Grid container direction="column">
-            <Grid item>
-              <Grid container justifyContent="space-between">
-                <Grid item>
-                  <Skeleton variant="rectangular" width={44} height={44} />
-                </Grid>
-                <Grid item>
-                  <Skeleton variant="rectangular" width={34} height={34} />
-                </Grid>
-              </Grid>
-            </Grid>
-            <Grid item>
-              <Skeleton variant="rectangular" sx={{ my: 2 }} height={40} />
-            </Grid>
-            <Grid item>
-              <Skeleton variant="rectangular" height={30} />
-            </Grid>
-          </Grid>
-        </CardContent>
-      </Card>
-    )
-  ) : (
-    (!data && (
-      <CardWrapper
-        border={false}
-        content={false}
-        onClick={() => {
-          router.push("/admin/teacher");
-        }}
-      >
-        <Box sx={{ p: 2.25 }}>
-          <Grid container direction="column">
-            <Grid item>
-              <Grid container justifyContent="space-between">
-                <Grid item>
-                  <Avatar
-                    variant="rounded"
-                    sx={{
-                      ...theme.typography.commonAvatar,
-                      ...theme.typography.largeAvatar,
-                      cursor: "auto",
-                      backgroundColor: theme.palette.primary[800],
-                      mt: 1,
-                    }}
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="icon icon-tabler icon-tabler-school"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      stroke-width="1.5"
-                      stroke="#ffffff"
-                      fill="none"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
+      ((data || data == 0) && (
+        <CardWrapper
+          border={false}
+          content={false}
+          onClick={() => {
+            router.push("/admin/teacher");
+          }}
+        >
+          <Box sx={{ p: 2.25 }}>
+            <Grid container direction="column">
+              <Grid item>
+                <Grid container justifyContent="space-between">
+                  <Grid item>
+                    <Avatar
+                      variant="rounded"
+                      sx={{
+                        ...theme.typography.commonAvatar,
+                        ...theme.typography.largeAvatar,
+                        cursor: "auto",
+                        backgroundColor: theme.palette.primary[800],
+                        mt: 1,
+                      }}
                     >
-                      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                      <path d="M22 9l-10 -4l-10 4l10 4l10 -4v6" />
-                      <path d="M6 10.6v5.4a6 3 0 0 0 12 0v-5.4" />
-                    </svg>
-                  </Avatar>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="icon icon-tabler icon-tabler-school"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        stroke-width="1.5"
+                        stroke="#ffffff"
+                        fill="none"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <path d="M22 9l-10 -4l-10 4l10 4l10 -4v6" />
+                        <path d="M6 10.6v5.4a6 3 0 0 0 12 0v-5.4" />
+                      </svg>
+                    </Avatar>
+                  </Grid>
                 </Grid>
               </Grid>
-            </Grid>
-            <Grid item>
-              <Grid container alignItems="center">
-                <Grid item>
-                  <Typography
-                    sx={{
-                      fontSize: "2.125rem",
-                      fontWeight: 500,
-                      mr: 1,
-                      mt: 1.75,
-                      mb: 0.75,
-                    }}
-                  >
-                    {data}
-                  </Typography>
+              <Grid item>
+                <Grid container alignItems="center">
+                  <Grid item>
+                    <Typography
+                      sx={{
+                        fontSize: "2.125rem",
+                        fontWeight: 500,
+                        mr: 1,
+                        mt: 1.75,
+                        mb: 0.75,
+                      }}
+                    >
+                      {data}
+                    </Typography>
+                  </Grid>
+                  <Grid item></Grid>
                 </Grid>
-                <Grid item></Grid>
+              </Grid>
+              <Grid item sx={{ mb: 1.25 }}>
+                <Typography
+                  sx={{
+                    fontSize: "1rem",
+                    fontWeight: 500,
+                    color: theme.palette.primary[200],
+                  }}
+                >
+                  Total Teachers
+                </Typography>
               </Grid>
             </Grid>
-            <Grid item sx={{ mb: 1.25 }}>
-              <Typography
-                sx={{
-                  fontSize: "1rem",
-                  fontWeight: 500,
-                  color: theme.palette.primary[200],
-                }}
-              >
-                Total Teachers
-              </Typography>
-            </Grid>
-          </Grid>
-        </Box>
-      </CardWrapper>
-    )) || <>sss</>
+          </Box>
+        </CardWrapper>
+      )) || <></> || <></>
+    )) || <></>
   );
 };
