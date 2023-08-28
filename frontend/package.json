@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start -H 0.0.0.0 -p 80",
     "lint": "next lint",
-    "export": "npm run build && next export -o _static"
+    "export": "npm run build && next export"
   },
   "dependencies": {
     "@apollo/client": "^3.7.12",
