@@ -105,11 +105,27 @@ export const add_video_data = (data: {}) => {
   return Token_admin_axios().post("/add-video-data", data);
 };
 export const add_user_in_class = (data: {}) => {
-  return Token_admin_axios().post("/add-user-in-class", data);
+  return Token_admin_axios().put("/add-user-in-class", data);
 };
 export const update_class = (data: {}) =>
   Token_admin_axios().put("/update-class", data);
 export const one_class = (id: string) =>
   Token_admin_axios().get("/class/" + id);
-
+export const one_video = (id: string) =>
+  Token_admin_axios().get("/video/" + id);
+export const update_video = (data: any, id: string) =>
+  Token_admin_axios().put("/update-video", {
+    title: data.title,
+    photo: data.photo,
+    disc: data.disc,
+    doc: data.doc,
+    link: data.link,
+    videoId: id,
+  });
+export const delete_video = (id: string) =>
+  Token_admin_axios().delete(`/video/${id}`);
+export const delete_user = (id: string) =>
+  Token_admin_axios().delete(`/user/${id}`);
+export const delete_classes = (id: string) =>
+  Token_admin_axios().delete(`/class/${id}`);
 // =========================(--ADMIN APIS--)============================================

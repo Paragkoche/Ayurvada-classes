@@ -6,8 +6,6 @@ import { cookies } from "next/headers";
 import React from "react";
 import { CircularProgress, Stack } from "@mui/material";
 
-const inter = Inter({ subsets: ["latin"] });
-
 export default function Home() {
   const route = useRouter();
   // const cookieStore = cookies();

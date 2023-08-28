@@ -3,279 +3,124 @@ import Layout from "../../Layout";
 import {
   Box,
   Button,
-  Divider,
+  Checkbox,
   FormControl,
-  Grid,
+  FormControlLabel,
   InputLabel,
   MenuItem,
   OutlinedInput,
   Select,
   Stack,
-  Typography,
-  styled,
   useMediaQuery,
-  useTheme,
 } from "@mui/material";
-import AnimateButton from "@/Components/extr/AnimateButton";
-import { NextComponentType, NextPage } from "next";
+import React, { useEffect } from "react";
 import { gql, useMutation, useQuery } from "@apollo/client";
-import { client } from "@/api";
-import { EnumType } from "typescript";
-import React from "react";
+import { useTheme } from "@emotion/react";
+import FileUpload from "@/Components/FileUpload";
+import AnimateButton from "@/Components/extr/AnimateButton";
+import { Classes, URL, add_video_data, one_video, update_video } from "@/api";
+import VideoUpload from "@/Components/VideoUpload";
 import { useRouter } from "next/router";
-import { date } from "yup";
-import FileUpload from "react-mui-fileuploader";
-const AuthWrapper1 = styled("div")(({ theme }) => ({
-  backgroundColor: theme.palette.primary.light,
-  minHeight: "60vh",
-}));
+
 const Page = () => {
   const theme: any = useTheme();
-  const matchDownSM = useMediaQuery(theme.breakpoints.down("md"));
-  const route = useRouter();
-  const { data, loading, error, refetch } = useQuery(gql`
-   query{ 
-    get_video(id: "${route.query.id}") {
-       id
-       title 
-       photo
-       disc
-
-      }
-    }
-  `);
-  const [update_user, { loading: lo, error: er, data: dd }] = useMutation(gql`
-    mutation update_video(
-      $title: String
-      $id: ID
-      $photo: String
-      $dic: String
-    ) {
-      update_video(title: $title, id: $id, photo: $photo, disc: $dic) {
-        id
-      }
-    }
-  `);
-  const [fromData, setFromData] = React.useState<any>();
-  console.log(fromData);
+  const [video, setVideo] = React.useState<any>();
+  const [data, setData] = React.useState<any>();
+  const [dis, setDis] = React.useState(false);
   const router = useRouter();
+  const { id }: any = router.query;
+
   React.useEffect(() => {
-    setFromData(data);
-  }, [data]);
+    try {
+      if (id)
+        one_video(id).then(({ data }) => {
+          console.log(data);
+
+          setData(data.data);
+        });
+    } catch (e) {
+      console.log(e);
+    }
+  }, [id]);
+  console.log(data);
+
   return (
-    !loading &&
-    data &&
-    fromData && (
+    data && (
       <>
-        <AuthWrapper1>
-          <Grid
-            container
-            direction="column"
-            justifyContent="flex-end"
-            sx={{ minHeight: "60vh" }}
-          >
-            <Grid item xs={12}>
-              <Grid
-                container
-                justifyContent={"center"}
-                alignItems={"center"}
-                sx={{ minHeight: "calc(60vh - 68px)" }}
-              >
-                <Grid item sx={{ m: { xs: 1, sm: 3 }, mb: 0 }}>
-                  <MainCard
-                    sx={{
-                      maxWidth: { xs: 400, lg: 475 },
-                      margin: { xs: 2.5, md: 3 },
-                      "& > *": {
-                        flexGrow: 1,
-                        flexBasis: "50%",
-                      },
-                    }}
-                    content={false}
-                  >
-                    <Box sx={{ p: { xs: 2, sm: 3, xl: 5 } }}>
-                      <Grid
-                        container
-                        spacing={2}
-                        alignItems="center"
-                        justifyContent="center"
-                      >
-                        <Grid item xs={12}>
-                          <Grid
-                            container
-                            direction={matchDownSM ? "column-reverse" : "row"}
-                            alignItems="center"
-                            justifyContent="center"
-                          >
-                            <Grid item>
-                              <Stack
-                                alignItems="center"
-                                justifyContent="center"
-                                spacing={1}
-                              >
-                                <Typography
-                                  color={theme.palette.secondary.main}
-                                  gutterBottom
-                                  variant={matchDownSM ? "h3" : "h2"}
-                                >
-                                  Update Video
-                                </Typography>
-                                <Typography
-                                  variant="caption"
-                                  fontSize="16px"
-                                  textAlign={matchDownSM ? "center" : "inherit"}
-                                >
-                                  Enter Video Information
-                                </Typography>
-                              </Stack>
-                            </Grid>
-                          </Grid>
-                        </Grid>
-                        <Grid item xs={12}>
-                          <Grid
-                            container
-                            direction="column"
-                            justifyContent="center"
-                            spacing={2}
-                          >
-                            <Grid item xs={12}>
-                              <Box
-                                sx={{
-                                  alignItems: "center",
-                                  display: "flex",
-                                }}
-                              >
-                                <Divider
-                                  sx={{ flexGrow: 1 }}
-                                  orientation="horizontal"
-                                />
-                                <Divider
-                                  sx={{ flexGrow: 1 }}
-                                  orientation="horizontal"
-                                />
-                              </Box>
-                            </Grid>
-                            <Grid
-                              item
-                              xs={12}
-                              container
-                              alignItems="center"
-                              justifyContent="center"
-                            >
-                              <Box sx={{ mb: 2 }}>
-                                <Typography variant="subtitle1">
-                                  Update Video
-                                </Typography>
-                              </Box>
-                            </Grid>
-                          </Grid>
-                        </Grid>
-                        <form
-                          onSubmit={(e) => {
-                            e.preventDefault();
-                            update_user({
-                              variables: {
-                                ...fromData.get_video,
-                                id: route.query.id,
-                              },
-                            })
-                              .then(() => {
-                                router.push("/admin/video/");
-                              })
-                              .finally(() => {
-                                refetch();
-                              });
-                          }}
-                        >
-                          <FormControl
-                            fullWidth
-                            sx={{ ...theme.typography.customInput }}
-                          >
-                            <InputLabel>Title</InputLabel>
-                            <OutlinedInput
-                              label="title"
-                              onChange={(e) => {
-                                setFromData((s: any) => ({
-                                  get_video: {
-                                    ...s.get_video,
-                                    title: e.target.value,
-                                  },
-                                }));
-                              }}
-                              value={fromData.get_video.title}
-                            />
-                          </FormControl>
+        <MainCard title="Add Video">
+          <Box px={20} py={3}>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                update_video(data, data.id).then(({ data }) => {
+                  router.push("/admin/video");
+                });
+                // setDis(true);
+              }}
+            >
+              <FormControl fullWidth sx={{ ...theme.typography.customInput }}>
+                <InputLabel>Name</InputLabel>
+                <OutlinedInput
+                  value={data.title}
+                  onChange={(e) =>
+                    setData((s: any) => ({ ...s, title: e.target.value }))
+                  }
+                />
+              </FormControl>
+              <FormControl fullWidth sx={{ ...theme.typography.customInput }}>
+                <InputLabel>Description </InputLabel>
+                <OutlinedInput
+                  multiline
+                  value={data.disc}
+                  onChange={(e) =>
+                    setData((s: any) => ({ ...s, disc: e.target.value }))
+                  }
+                />
+              </FormControl>
+              <FormControl fullWidth sx={{ ...theme.typography.customInput }}>
+                <InputLabel>Document Link </InputLabel>
+                <OutlinedInput
+                  multiline
+                  value={data.doc}
+                  onChange={(e) =>
+                    setData((s: any) => ({ ...s, doc: e.target.value }))
+                  }
+                />
+              </FormControl>
+              <FileUpload
+                imageLink={data.photo}
+                onChange={(e) => {
+                  setData({ ...data, photo: e });
+                }}
+              />
+              <br />
+              <VideoUpload
+                onChange={(e) => {
+                  setData((s: any) => ({ ...s, link: e }));
+                  console.log(e);
+                }}
+              />
+              <Box sx={{ marginX: 5, width: 100, height: 10 }}></Box>
 
-                          <FileUpload
-                            acceptedType="image/*"
-                            getBase64
-                            onFilesChange={(e) => {
-                              if (e.length !== 0)
-                                setFromData((s: any) => ({
-                                  get_video: {
-                                    ...s.get_video,
-                                    photo: e[0].path,
-                                  },
-                                }));
-                            }}
-                          />
-                          <FormControl
-                            fullWidth
-                            sx={{ ...theme.typography.customInput }}
-                          >
-                            <InputLabel>description</InputLabel>
-                            <OutlinedInput
-                              label="description"
-                              onChange={(e) => {
-                                setFromData((s: any) => ({
-                                  get_video: {
-                                    ...s.get_video,
-                                    disc: e.target.value,
-                                  },
-                                }));
-                              }}
-                              value={fromData.get_video.disc}
-                            />
-                          </FormControl>
-
-                          <Box>
-                            <AnimateButton>
-                              <Button
-                                disableElevation
-                                disabled={lo}
-                                fullWidth
-                                size="large"
-                                type="submit"
-                                variant="contained"
-                                color="secondary"
-                              >
-                                Update
-                              </Button>
-                            </AnimateButton>
-                          </Box>
-                        </form>
-                      </Grid>
-                    </Box>
-                  </MainCard>
-                </Grid>
-              </Grid>
-            </Grid>
-          </Grid>
-        </AuthWrapper1>
+              <Box sx={{ marginX: 5, width: 100, height: 10 }}></Box>
+              <AnimateButton>
+                <Button
+                  fullWidth
+                  disabled={dis}
+                  size="large"
+                  type="submit"
+                  variant="contained"
+                  color="secondary"
+                >
+                  Submit
+                </Button>
+              </AnimateButton>
+            </form>
+          </Box>
+        </MainCard>
       </>
     )
   );
 };
-
-// update.getInitialProps = async ({ req, query }) => {
-//   console.log(query);
-
-//   const { data } = await client.query({
-//     query: gql`
-
-//   `,
-//   });
-//   return { data };
-// };
 Page.getLayout = (page: any) => <Layout>{page}</Layout>;
 export default Page;

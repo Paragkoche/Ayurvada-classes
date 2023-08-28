@@ -25,7 +25,7 @@ import { Typography } from "@mui/material";
 import { useTheme } from "@mui/material";
 import { IconButton } from "@mui/material";
 import { useRouter } from "next/router";
-import { URL, Videos } from "@/api";
+import { URL, Videos, delete_video } from "@/api";
 import React, { useState } from "react";
 export function applyPagination(
   documents: any,
@@ -208,13 +208,17 @@ const Page = () => {
         <Dialog open={dd}>
           <DialogTitle>Do you want to {D} this Video?</DialogTitle>
           <DialogContent>
-            <DialogContentText>NAME : {videoName.name}</DialogContentText>
+            <DialogContentText>NAME : {videoName.title}</DialogContentText>
           </DialogContent>
           <DialogActions>
             <Button
               color="error"
               onClick={() => {
                 if (D == "Delete") {
+                  delete_video(videoName.id).then(() => {
+                    alert(`Video delete ${videoName.title}`);
+                    router.reload();
+                  });
                 } else {
                   router.push("/admin/video/update/" + videoName.id);
                 }

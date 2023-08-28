@@ -28,6 +28,8 @@ export class Video {
   @Column({ type: "text" })
   disc: string;
 
+  @Column({ nullable: true })
+  doc: string;
   @Column()
   link: string;
 
@@ -50,8 +52,7 @@ export class Video {
   @OneToMany(() => Comment, (comment) => comment.video)
   Comments: Comment[];
 
-  @ManyToMany(() => Like)
-  @JoinTable()
+  @OneToMany(() => Like, (link) => link.video)
   Likes: Like[];
 }
 
@@ -63,6 +64,11 @@ export class Like {
   @OneToOne(() => User)
   @JoinColumn()
   user: User;
+  @ManyToOne(() => Video, (video) => video.Likes, {
+    cascade: true,
+    onDelete: "CASCADE",
+  })
+  video: Video;
   @CreateDateColumn({
     type: "timestamp",
     default: () => "CURRENT_TIMESTAMP(6)",
@@ -87,12 +93,18 @@ export class Comment {
 
   @ManyToOne(() => User, (user) => user.comments)
   user: User;
-  @ManyToOne(() => Video, (video) => video.Comments)
+  @ManyToOne(() => Video, (video) => video.Comments, {
+    cascade: true,
+    onDelete: "CASCADE",
+  })
   video: Video;
   @OneToMany((type) => Comment, (comment) => comment.Comment_of_comment_rle)
   Comment_of_Comment: Comment[];
 
-  @ManyToOne((type) => Comment, (comment) => comment.Comment_of_Comment)
+  @ManyToOne((type) => Comment, (comment) => comment.Comment_of_Comment, {
+    cascade: true,
+    onDelete: "CASCADE",
+  })
   Comment_of_comment_rle: Comment;
 
   @CreateDateColumn({

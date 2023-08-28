@@ -265,7 +265,7 @@ export const get_video = async (req: StudentTokenRequest, res: Response) => {
 export const add_like = async (req: StudentTokenRequest, res: Response) => {
   try {
     const { id } = req.params;
-    const video = await VideoDb.find({
+    const video = await VideoDb.findOne({
       where: {
         id,
       },
@@ -273,23 +273,26 @@ export const add_like = async (req: StudentTokenRequest, res: Response) => {
         Likes: true,
       },
     });
-    if (video.length == 0)
+    if (!video)
       res.status(201).json({
         status: 201,
         message: "Video not found",
       });
     const create_like = await LikeDb.save(
       LikeDb.create({
+        video: {
+          id: video.id,
+        },
         user: {
           id: req.studentData.id,
         },
       })
     );
     if (!create_like) return new Error("like not create");
-    const update = await VideoDb.update(video[0].id, {
-      Likes: [...video[0].Likes, create_like],
-    });
-    if (!update) return new Error("Like not add");
+    // const update = await VideoDb.update(video[0].id, {
+    //   Likes: [...video[0].Likes, create_like],
+    // });
+    // if (!update) return new Error("Like not add");
     return res.json({
       status: 200,
       data: create_like,
@@ -384,8 +387,6 @@ export const add_comment = async (req: StudentTokenRequest, res: Response) => {
       data: comment_create,
     });
   } catch (e) {
-    throw e;
-
     return res.status(500).json({
       status: 500,
       message: "Internal server error",

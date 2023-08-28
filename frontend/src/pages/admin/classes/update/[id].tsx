@@ -101,7 +101,7 @@ const Page = () => {
                 <FormControl fullWidth sx={{ ...theme.typography.customInput }}>
                   <InputLabel>End on</InputLabel>
                   <OutlinedInput
-                    type="date"
+                    type="text"
                     value={data.end_on}
                     onChange={(e) =>
                       setData({

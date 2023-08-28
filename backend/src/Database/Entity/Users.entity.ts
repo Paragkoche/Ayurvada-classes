@@ -43,14 +43,20 @@ export class User {
   @Column({ enum: ["Admin", "Teacher", "Student"] })
   role: "Admin" | "Teacher" | "Student";
 
-  @ManyToMany(() => Classes)
+  @ManyToMany(() => Classes, { cascade: true, onDelete: "CASCADE" })
   @JoinTable()
   Classes: Classes[];
 
-  @OneToMany(() => PayFor, (pfor) => pfor.user)
+  @OneToMany(() => PayFor, (pfor) => pfor.user, {
+    cascade: true,
+    onDelete: "CASCADE",
+  })
   payFor: PayFor[];
 
-  @OneToMany(() => Comment, (comment) => comment.user)
+  @OneToMany(() => Comment, (comment) => comment.user, {
+    cascade: true,
+    onDelete: "CASCADE",
+  })
   comments: Comment[];
   @CreateDateColumn({
     type: "timestamp",
@@ -82,7 +88,7 @@ export class PayFor {
   @ManyToOne(() => User, (user) => user.payFor)
   user: User;
 
-  @OneToOne(() => Classes)
+  @OneToOne(() => Classes, { cascade: true, onDelete: "CASCADE" })
   @JoinColumn()
   class: Classes;
 

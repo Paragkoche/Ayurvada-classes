@@ -33,7 +33,7 @@ export class OTP {
   })
   UpdateAt: Date;
 
-  @OneToOne(() => User)
+  @OneToOne(() => User, { cascade: true, onDelete: "CASCADE" })
   @JoinColumn()
   User: User;
 }

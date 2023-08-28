@@ -11,6 +11,8 @@ export default ({
   onChange: (e: any) => void;
 }) => {
   const [src, setSrc] = useState(imageLink);
+  console.log(src);
+  
   const ref = useRef<any>(null);
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
     const files = e.currentTarget.files;

@@ -41,9 +41,12 @@ export class Classes {
   })
   UpdateAt: Date;
 
-  @OneToMany(() => Video, (video) => video.classes)
+  @OneToMany(() => Video, (video) => video.classes, {
+    cascade: true,
+    onDelete: "CASCADE",
+  })
   Videos: Video[];
 
-  @ManyToOne(() => User, (user) => user.Classes)
+  @ManyToOne(() => User, (user) => user.Classes, { onDelete: "CASCADE" })
   users: User;
 }

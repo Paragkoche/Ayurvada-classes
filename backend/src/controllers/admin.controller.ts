@@ -142,15 +142,8 @@ export const get_list_of_user = async (
         role: "Student",
       },
       relations: {
-        payFor: true,
-      },
-      select: {
         payFor: {
-          class: {
-            name: true,
-            end_on: true,
-          },
-          joinAt: true,
+          class: true,
         },
       },
     });
@@ -358,10 +351,37 @@ export const Add_update_video = async (
   res: Response
 ) => {
   try {
+    const data = req.body;
+
+    const update_class = await VideoDb.update(
+      { id: data.videoId },
+      {
+        title: data.title,
+        photo: data.photo,
+        disc: data.disc,
+        doc: data.doc,
+        link: data.link,
+      }
+    );
+    console.log(data);
+
+    console.log(update_class);
+
+    if (!update_class) return new Error("Class not Update");
+    return res.json({
+      status: 200,
+      data: await VideoDb.findOne({
+        where: { id: data.videoId },
+        cache: true,
+      }),
+    });
   } catch (e) {
+    console.log(e);
+
     return res.status(500).json({
       status: 500,
       message: "Internal server error",
+      error: e.toString(),
     });
   }
 };

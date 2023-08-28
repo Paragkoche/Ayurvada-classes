@@ -22,7 +22,7 @@ interface CommentType {
   UpdateAt: Date;
 }
 
-const Comment = ({ comment }: { comment: CommentType }) => {
+const Comment = ({ comment, data }: { comment: CommentType; data: any }) => {
   const [_comment, setComment] = useState<string>("");
   console.log(comment.Comment_of_Comment);
   const [showReplies, setShowReplies] = useState(false);
@@ -59,7 +59,15 @@ const Comment = ({ comment }: { comment: CommentType }) => {
                           comment.id,
                           _comment
                         ).then(({ data }) => {
-                          console.log(data);
+                          data((a: any) => ({
+                            data: {
+                              ...a?.data,
+                              Comments: [
+                                ...a?.data.Comments,
+                                JSON.parse(data).data,
+                              ],
+                            },
+                          }));
                         });
                       }}
                     >
@@ -78,7 +86,7 @@ const Comment = ({ comment }: { comment: CommentType }) => {
       {showReplies && (
         <Box ml={2} mt={1}>
           {comment?.Comment_of_Comment?.map((reply) => (
-            <Comment key={reply.id} comment={reply} />
+            <Comment key={reply.id} comment={reply} data={data} />
           ))}
         </Box>
       )}

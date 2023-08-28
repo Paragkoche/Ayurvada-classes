@@ -14,9 +14,15 @@ import { ChangeEvent, useRef, useState } from "react";
 import { add_video_file } from "@/api";
 import { isNonNullChain } from "typescript";
 
-export default ({ onChange: setLink }: { onChange: (e: any) => void }) => {
+export default ({
+  onChange: setLink,
+  Link,
+}: {
+  onChange: (e: any) => void;
+  Link?: string;
+}) => {
   const [src, setSrc] = useState<any>();
-  const [video_url, setVideo_url] = useState("");
+  const [video_url, setVideo_url] = useState(Link);
   const ref = useRef<any>(null);
   const [uploading, setupLoading] = useState<number | null | undefined>(null);
   const [loading, setLoading] = useState(false);
@@ -54,7 +60,7 @@ export default ({ onChange: setLink }: { onChange: (e: any) => void }) => {
 
                 sources: [
                   {
-                    src: video_url,
+                    src: video_url || Link || "",
                     provider: "html5",
                     size: 240,
                   },

@@ -27,6 +27,9 @@ import {
   OutlinedInput,
   FormControl,
   InputLabel,
+  Select,
+  MenuItem,
+  FormLabel,
 } from "@mui/material";
 import { Table } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
@@ -43,9 +46,10 @@ import { Typography } from "@mui/material";
 import { useTheme } from "@mui/material";
 import { IconButton, InputAdornment } from "@mui/material";
 import { useRouter } from "next/router";
-import React from "react";
-import { Users } from "@/api";
+import React, { useState } from "react";
+import { Classes, Users, add_user_in_class, delete_user } from "@/api";
 import AnimateButton from "@/Components/extr/AnimateButton";
+import { MultiSelect } from "react-mui-multi-select";
 export function applyPagination(
   documents: any,
   page: number,
@@ -66,10 +70,14 @@ const Page = () => {
   const [seleteName, setSelectedName] = React.useState<any>({ name: "" });
   const [D, setD] = React.useState("");
   const [data, _setData] = React.useState<any[]>([]);
+  const [classes, setClasses] = React.useState([]);
 
   React.useEffect(() => {
     Users()
       .then((data) => {
+        Classes().then(({ data }) => {
+          setClasses(data.data);
+        });
         _setData(data.data.data);
       })
       .finally(() => {
@@ -91,7 +99,8 @@ const Page = () => {
   const handleRowsPerPageChange = React.useCallback((event: any) => {
     setRowsPerPage(event.target.value);
   }, []);
-
+  const [selectClass, setSelectClass] = useState("All");
+  const [name, setName] = useState("");
   return (
     !loading &&
     data && (
@@ -128,26 +137,71 @@ const Page = () => {
                       </IconButton>
                     </InputAdornment>
                   }
-                  placeholder="name:<name of student>"
+                  value={name}
+                  onChange={(e) => {
+                    setName(e.target.value);
+                    setData(
+                      applyPagination(
+                        e.target.value == ""
+                          ? data
+                          : _data
+                              .map((v: any) => {
+                                if (v.name.includes(e.target.value)) {
+                                  return v;
+                                }
+                              })
+                              .filter((v: any) => v != undefined) || [],
+                        page,
+                        rowsPerPage
+                      )
+                    );
+                  }}
+                  placeholder="Name of Student"
                   fullWidth={false}
                 ></OutlinedInput>
               </FormControl>
             </Stack>
 
-            <Stack>
-              {["All"].map((v) => (
-                <AnimateButton>
-                  <Button
-                    disableElevation
-                    size="large"
-                    type="submit"
-                    variant="contained"
-                    color="secondary"
-                  >
-                    {v}
-                  </Button>
-                </AnimateButton>
-              ))}
+            <Stack sx={{ width: 400 }}>
+              <FormControl fullWidth>
+                <FormLabel>Class</FormLabel>
+                <Select
+                  label="Class"
+                  value={selectClass}
+                  onChange={(e) => {
+                    setSelectClass(e.target.value);
+                    console.log(data);
+
+                    if (selectClass == "All")
+                      setData(applyPagination(data || [], page, rowsPerPage));
+                    else {
+                      const studentsForClass = [];
+
+                      for (const student of data) {
+                        const classInfo = student.payFor.find(
+                          (payment: any) => payment.class.name !== selectClass
+                        );
+                        if (classInfo) {
+                          console.log(classInfo);
+
+                          studentsForClass.push(student);
+                        }
+                      }
+                      setData(
+                        applyPagination(
+                          studentsForClass || [],
+                          page,
+                          rowsPerPage
+                        )
+                      );
+                    }
+                  }}
+                >
+                  {[{ name: "All" }, ...classes]?.map((v) => (
+                    <MenuItem value={v.name}>{v.name}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
             </Stack>
           </Stack>
 
@@ -195,6 +249,13 @@ const Page = () => {
                     <Typography
                       sx={{ fontWeight: theme.typography.fontWeightBold }}
                     >
+                      Classes
+                    </Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography
+                      sx={{ fontWeight: theme.typography.fontWeightBold }}
+                    >
                       Delete
                     </Typography>
                   </TableCell>
@@ -208,57 +269,10 @@ const Page = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {_data.map((v: any) => (
-                  <TableRow>
-                    <TableCell>
-                      <Typography flexWrap={"wrap"}>{v.name}</Typography>
-                    </TableCell>
-
-                    <TableCell>
-                      <Typography flexWrap={"wrap"}>{v.email}</Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography flexWrap={"wrap"}>{v.age}</Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography flexWrap={"wrap"}>{v.gender}</Typography>
-                    </TableCell>
-
-                    <TableCell>
-                      <Checkbox disabled checked={v.is_active} />
-                    </TableCell>
-                    <TableCell>
-                      <Button
-                        color="error"
-                        onClick={() => {
-                          setD("Delete");
-                          setSelectedName({
-                            id: v.id,
-                            name: v.name,
-                          });
-                          setDialog((s) => !s);
-                        }}
-                      >
-                        <Delete />
-                      </Button>
-                    </TableCell>
-                    <TableCell>
-                      <Button
-                        color="warning"
-                        onClick={() => {
-                          setD("Update");
-                          setSelectedName({
-                            id: v.id,
-                            name: v.name,
-                          });
-                          setDialog((s) => !s);
-                        }}
-                      >
-                        <Update />
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                {classes.length &&
+                  _data.map((v: any) => (
+                    <T {...{ classes, v, setD, setSelectedName, setDialog }} />
+                  ))}
               </TableBody>
             </Table>
           </TableContainer>
@@ -284,6 +298,7 @@ const Page = () => {
                 console.log(D);
 
                 if (D == "Delete") {
+                  delete_user(seleteName.id);
                 } else {
                   router.push("/admin/users/update/" + seleteName.id);
                 }
@@ -296,6 +311,89 @@ const Page = () => {
         </Dialog>
       </>
     )
+  );
+};
+const T = ({ classes, v, setD, setSelectedName, setDialog }: any) => {
+  const [PayFor, setPayFor] = useState<any>(v.payFor.map((v: any) => v.class));
+  const [allClasses, setAllClasses] = useState(classes);
+
+  React.useEffect(() => {
+    let ids = PayFor.map((v: any) => v.id);
+    setAllClasses((s: any) => s.filter((v: any) => !ids.includes(v.id)));
+  }, []);
+
+  return (
+    <TableRow>
+      <TableCell>
+        <Typography flexWrap={"wrap"}>{v.name}</Typography>
+      </TableCell>
+
+      <TableCell>
+        <Typography flexWrap={"wrap"}>{v.email}</Typography>
+      </TableCell>
+      <TableCell>
+        <Typography flexWrap={"wrap"}>{v.age}</Typography>
+      </TableCell>
+      <TableCell>
+        <Typography flexWrap={"wrap"}>{v.gender}</Typography>
+      </TableCell>
+
+      <TableCell>
+        <Checkbox disabled checked={v.is_active} />
+      </TableCell>
+      <TableCell>
+        <MultiSelect
+          getOptionLabel={(v: any) => {
+            return v.name;
+          }}
+          getOptionKey={(v: any) => {
+            return v.id;
+          }}
+          options={allClasses}
+          value={PayFor}
+          onChange={function (value: any[]): void {
+            console.log(value);
+
+            add_user_in_class({ classId: value.at(-1).id, userId: v.id }).then(
+              ({ data }) => {
+                console.log(data.data);
+                setPayFor(value);
+              }
+            );
+          }}
+        />
+      </TableCell>
+      <TableCell>
+        <Button
+          color="error"
+          onClick={() => {
+            setD("Delete");
+            setSelectedName({
+              id: v.id,
+              name: v.name,
+            });
+            setDialog((s: any) => !s);
+          }}
+        >
+          <Delete />
+        </Button>
+      </TableCell>
+      <TableCell>
+        <Button
+          color="warning"
+          onClick={() => {
+            setD("Update");
+            setSelectedName({
+              id: v.id,
+              name: v.name,
+            });
+            setDialog((s: any) => !s);
+          }}
+        >
+          <Update />
+        </Button>
+      </TableCell>
+    </TableRow>
   );
 };
 Page.getLayout = (page: any) => <Layout>{page}</Layout>;
