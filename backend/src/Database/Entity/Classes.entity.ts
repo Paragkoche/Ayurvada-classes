@@ -47,4 +47,7 @@ export class Classes {
 
   @ManyToOne(() => User, (user) => user.Classes, { onDelete: "CASCADE" })
   users: User;
+
+  @ManyToOne(() => PayFor, (pf) => pf.class)
+  payFor: PayFor;
 }

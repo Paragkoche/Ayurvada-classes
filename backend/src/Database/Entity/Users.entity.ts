@@ -88,8 +88,10 @@ export class PayFor {
   @ManyToOne(() => User, (user) => user.payFor)
   user: User;
 
-  @OneToOne(() => Classes, { cascade: true, onDelete: "CASCADE" })
-  @JoinColumn()
+  @OneToMany(() => Classes, (classes) => classes.payFor, {
+    cascade: true,
+    onDelete: "CASCADE",
+  })
   class: Classes;
 
   @Column("timestamp", {
