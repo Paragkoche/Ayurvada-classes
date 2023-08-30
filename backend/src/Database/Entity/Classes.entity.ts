@@ -26,8 +26,6 @@ export class Classes {
 
   @Column()
   end_on: string;
-  @Column()
-  doc_link: string;
   @CreateDateColumn({
     type: "timestamp",
     default: () => "CURRENT_TIMESTAMP(6)",

@@ -34,6 +34,7 @@ export default () => {
   const theme: any = useTheme();
   const matchDownSM = useMediaQuery(theme.breakpoints.down("md"));
   const [password, setPassword] = React.useState("");
+  const [otp, setOtp] = React.useState("");
   const [error, setError] = React.useState("");
   const [dis, setDis] = React.useState(false);
   const [show, setShow] = React.useState(false);
@@ -135,6 +136,39 @@ export default () => {
                             });
                         }}
                       >
+                        <InputLabel htmlFor="outlined-adornment-email-login">
+                          OTP
+                        </InputLabel>
+                        <FormControl
+                          fullWidth
+                          sx={{ ...theme.typography.customInput }}
+                        >
+                          <MuiOtpInput
+                            value={otp}
+                            length={4}
+                            TextFieldsProps={{
+                              type: "number",
+                              placeholder: "-",
+                              sx: {
+                                "&::-webkit-outer-spin-button": {
+                                  display: "none",
+                                },
+                                "&:::-webkit-outer-spin-button": {
+                                  display: "none",
+                                },
+                              },
+                            }}
+                            onChange={(e) => setOtp(e)}
+                          />
+                          {error && (
+                            <FormHelperText
+                              error
+                              id="standard-weight-helper-text-email-login"
+                            >
+                              {error}
+                            </FormHelperText>
+                          )}
+                        </FormControl>
                         <FormControl
                           fullWidth
                           sx={{ ...theme.typography.customInput }}

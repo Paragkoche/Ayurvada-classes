@@ -29,7 +29,7 @@ const Page = () => {
     title: "",
     photo: "",
     disc: "",
-
+    doc: "",
     link: "",
   });
   const [dis, setDis] = React.useState(false);
@@ -85,6 +85,15 @@ const Page = () => {
                 }
               />
             </FormControl>
+
+            <FormControl fullWidth sx={{ ...theme.typography.customInput }}>
+              <InputLabel>Document Link</InputLabel>
+              <OutlinedInput
+                type="text"
+                value={data.doc}
+                onChange={(e) => setData({ ...data, doc: e.target.value })}
+              />
+            </FormControl>
             <FileUpload
               imageLink={data.photo}
               onChange={(e) => {
@@ -104,7 +113,7 @@ const Page = () => {
             <AnimateButton>
               <Button
                 fullWidth
-                disabled={dis}
+                disabled={data.link == "" || dis}
                 size="large"
                 type="submit"
                 variant="contained"

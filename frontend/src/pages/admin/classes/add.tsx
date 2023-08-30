@@ -24,7 +24,6 @@ const Page = () => {
     pay: "",
     end_on: "",
     name: "",
-    doc_link: "",
   });
   const router = useRouter();
 
@@ -40,7 +39,6 @@ const Page = () => {
               pay: "",
               end_on: "",
               name: "",
-              doc_link: "",
             }}
             onSubmit={(e) => {
               console.log(e);
@@ -66,7 +64,6 @@ const Page = () => {
                         pay: "",
                         end_on: "",
                         name: "",
-                        doc_link: "",
                       });
                       alert("class make successfully");
                       router.push("/admin/classes");
@@ -94,7 +91,7 @@ const Page = () => {
                   onChange={(e) => setData({ ...data, pay: e.target.value })}
                 />
               </FormControl>
-              <FormControl fullWidth sx={{ ...theme.typography.customInput }}>
+               <FormControl fullWidth sx={{ ...theme.typography.customInput }}>
                 <InputLabel>End on</InputLabel>
                 <OutlinedInput
                   type="text"
@@ -102,7 +99,7 @@ const Page = () => {
                   onChange={(e) => setData({ ...data, end_on: e.target.value })}
                 />
               </FormControl>
-              <FormControl fullWidth sx={{ ...theme.typography.customInput }}>
+             {/* <FormControl fullWidth sx={{ ...theme.typography.customInput }}>
                 <InputLabel>Document Link</InputLabel>
                 <OutlinedInput
                   type="text"
@@ -111,7 +108,7 @@ const Page = () => {
                     setData({ ...data, doc_link: e.target.value })
                   }
                 />
-              </FormControl>
+              </FormControl> */}
               <FileUpload
                 imageLink={data.photo}
                 onChange={(e) => {

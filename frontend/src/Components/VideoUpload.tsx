@@ -24,7 +24,7 @@ export default ({
   const [src, setSrc] = useState<any>();
   const [video_url, setVideo_url] = useState(Link);
   const ref = useRef<any>(null);
-  const [uploading, setupLoading] = useState<number | null | undefined>(null);
+  const [uploading, setupLoading] = useState<number | null | undefined>(0);
   const [loading, setLoading] = useState(false);
   const [isUploaded, setIsUploaded] = useState(false);
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -36,17 +36,23 @@ export default ({
   };
   const Uploading = () => {
     console.log(src);
+    const fromData = new FormData();
 
-    if (src)
-      add_video_file(src, (e) => {
-        console.log(e.progress);
+    if (src) {
+      fromData.append("video", src);
+      add_video_file(fromData, (e) => {
+        console.log(e.progress?.toFixed(3));
         setupLoading(e.progress);
       }).then(({ data }) => {
-        setLink((data.path as string).replace("./", " "));
-        console.log((data.path as string).replace("./", "/"));
+        console.log(data);
+        setLink(data as string);
+        console.log(data as string);
         setIsUploaded(true);
       });
+    }
   };
+  console.log((uploading || 0) * 100 <= 1 ? "indeterminate" : "determinate");
+
   return (
     <Grid container spacing={30}>
       <Grid item xs={10}>
@@ -99,7 +105,10 @@ export default ({
               </Grid>
             )
           ) : (
-            <CircularProgress variant="determinate" value={uploading * 100} />
+            <CircularProgress
+              variant={uploading * 100 <= 1 ? "indeterminate" : "determinate"}
+              value={uploading * 100}
+            />
           )}
         </Grid>
       </Grid>

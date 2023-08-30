@@ -9,6 +9,7 @@ import {
   MenuItem,
   Button,
 } from "@mui/material";
+import { addUser } from "@/api";
 import AnimateButton from "@/Components/extr/AnimateButton";
 import { useTheme } from "@emotion/react";
 import React from "react";
@@ -24,25 +25,6 @@ const Page = () => {
     password: "",
   });
   const [dis, setDis] = React.useState(false);
-  const [addUSer, { loading: loo, data: d, error: er }] = useMutation(gql`
-    mutation make_client(
-      $name: String
-      $email: String
-      $age: String
-      $gender: User_Gander
-      $password: String
-    ) {
-      make_client(
-        name: $name
-        email: $email
-        age: $age
-        gender: $gender
-        password: $password
-      ) {
-        id
-      }
-    }
-  `);
 
   return (
     <>
@@ -51,21 +33,19 @@ const Page = () => {
           <form
             onSubmit={(e) => {
               e.preventDefault();
-              addUSer({
-                variables: {
-                  name: data.name,
-                  email: data.email,
-                  age: data.age,
-                  gender: data.gender,
-                  password: data.password,
-                },
-              })
-                .then((e) => {
-                  if (!e.data) {
-                    return;
-                  }
-                  alert("User Created");
+              setDis(true);
+              addUser(data)
+                .then(({ data }) => {
+                  alert("User Add");
+                  setData({
+                    name: "",
+                    email: "",
+                    age: "",
+                    gender: "",
+                    password: "",
+                  });
                 })
+
                 .finally(() => {
                   setDis(false);
                 });

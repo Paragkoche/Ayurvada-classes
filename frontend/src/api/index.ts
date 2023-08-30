@@ -1,6 +1,6 @@
 import axios, { AxiosProgressEvent } from "axios";
 
-export const URL = "http://localhost:8080/v1";
+export const URL = "https://api.tanwishlife.com/v1";
 
 const student_route = `${URL}/student`;
 const admin_route = `${URL}/admin`;
@@ -97,7 +97,7 @@ export const add_video_file = (
   data: any,
   fun: (e: AxiosProgressEvent) => void
 ) => {
-  return Token_admin_axios().post("/add-video-file", data, {
+  return axios.post("/api/video-upload", data, {
     onUploadProgress: fun,
   });
 };
@@ -113,6 +113,8 @@ export const one_class = (id: string) =>
   Token_admin_axios().get("/class/" + id);
 export const one_video = (id: string) =>
   Token_admin_axios().get("/video/" + id);
+export const one_user = (id: string) => Token_admin_axios().get("/user/" + id);
+
 export const update_video = (data: any, id: string) =>
   Token_admin_axios().put("/update-video", {
     title: data.title,
@@ -122,10 +124,15 @@ export const update_video = (data: any, id: string) =>
     link: data.link,
     videoId: id,
   });
+export const update_user = (data: {}, id: string) =>
+  Token_admin_axios().put("/update-user", { ...data, userId: id });
 export const delete_video = (id: string) =>
   Token_admin_axios().delete(`/video/${id}`);
 export const delete_user = (id: string) =>
   Token_admin_axios().delete(`/user/${id}`);
 export const delete_classes = (id: string) =>
   Token_admin_axios().delete(`/class/${id}`);
+export const addUser = (data: {}) =>
+  Token_admin_axios().post("/add-user", data);
+
 // =========================(--ADMIN APIS--)============================================

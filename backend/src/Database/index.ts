@@ -1,6 +1,8 @@
 import { DataSource } from "typeorm";
 import { config } from "dotenv";
 config();
+console.log(__dirname);
+
 export default new DataSource({
   type: "postgres",
   username: process.env.DB_username,

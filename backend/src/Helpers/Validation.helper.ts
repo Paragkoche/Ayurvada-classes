@@ -2,6 +2,7 @@ import { StudentInput, StudentLoginInput } from "@/types/Student";
 import { NextFunction, Request, Response } from "express";
 import db from "@/Database";
 import { User } from "@/Database/Entity/Users.entity";
+import { password_hash } from "./Password.helper";
 let password_regx = /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,16}$/;
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 const userDB = db.getRepository(User);
@@ -125,6 +126,24 @@ export const Otp_validated = async (
 
 export const ClassesAdd = (req: Request, res: Response, next: NextFunction) => {
   try {
+  } catch (e) {
+    return res.status(500).json({
+      status: 500,
+      message: "Internal server error",
+      error: e,
+    });
+  }
+};
+
+export const update_user = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { password } = req.body;
+    req.body.password = await password_hash(password);
+    next();
   } catch (e) {
     return res.status(500).json({
       status: 500,

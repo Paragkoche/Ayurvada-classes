@@ -72,7 +72,11 @@ export default () => {
                   >
                     <Grid item sx={{ mb: 3 }}>
                       <Link href={"/"}>
-                        <Image style={{width: '100%',height: '100px'}} src={markLogo} alt="logo" />
+                        <Image
+                          style={{ width: "100%", height: "100px" }}
+                          src={markLogo}
+                          alt="logo"
+                        />
                       </Link>
                     </Grid>
                     <Grid item xs={12}>
@@ -123,7 +127,7 @@ export default () => {
                                 sessionStorage.setItem("email", otp);
                                 alert(data.message);
                                 setOtp("");
-                                router.push("/otp");
+                                router.push("/password");
                               },
                               (e) => {
                                 alert(e.message);

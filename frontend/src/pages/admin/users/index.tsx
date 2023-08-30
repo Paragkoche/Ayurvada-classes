@@ -146,7 +146,14 @@ const Page = () => {
                           ? data
                           : _data
                               .map((v: any) => {
-                                if (v.name.includes(e.target.value)) {
+                                if (
+                                  (v.name as string)
+                                    .toLocaleLowerCase()
+
+                                    .includes(
+                                      e.target.value.toLocaleLowerCase()
+                                    )
+                                ) {
                                   return v;
                                 }
                               })
@@ -269,10 +276,9 @@ const Page = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {classes.length &&
-                  _data.map((v: any) => (
-                    <T {...{ classes, v, setD, setSelectedName, setDialog }} />
-                  ))}
+                {_data.map((v: any) => (
+                  <T {...{ classes, v, setD, setSelectedName, setDialog }} />
+                ))}
               </TableBody>
             </Table>
           </TableContainer>
