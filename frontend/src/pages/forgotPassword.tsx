@@ -119,7 +119,7 @@ export default () => {
                           e.preventDefault();
                           setDis(true);
                           axios
-                            .put(URL + "/forgot", {
+                            .post(URL + "/forgot", {
                               email: otp,
                             })
                             .then(

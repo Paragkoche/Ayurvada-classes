@@ -37,6 +37,7 @@ export const send_otp = async (email: string) => {
     
             `,
   });
+
   const user = await userDB.findOne({
     where: {
       email,
@@ -85,9 +86,24 @@ export const re_send_otp = async (email: string) => {
       },
     },
   });
-  const _otp = await OtpDB.update(_otp_id.id, {
-    otp,
-  });
+  if (!_otp_id) {
+    const user = await userDB.findOne({
+      where: {
+        email,
+      },
+    });
+    const _otp = await OtpDB.save(
+      OtpDB.create({
+        otp,
+        User: user,
+      })
+    );
+    return _otp;
+  } else {
+    const _otp = await OtpDB.update(_otp_id.id, {
+      otp,
+    });
 
-  return _otp;
+    return _otp;
+  }
 };

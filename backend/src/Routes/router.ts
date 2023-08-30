@@ -5,7 +5,7 @@ import { Login, verify_otp } from "@/controllers/Student.controller";
 import db from "@/Database";
 import { User } from "@/Database/Entity/Users.entity";
 import { OTP } from "@/Database/Entity/Otp.entity";
-import { send_otp } from "@/Helpers/Email.helper";
+import { re_send_otp, send_otp } from "@/Helpers/Email.helper";
 import { password_hash } from "@/Helpers/Password.helper";
 import { makeToken } from "@/Helpers/Token.helper";
 const router = Router();
@@ -24,7 +24,7 @@ router.post("/forgot", async (req, res) => {
       return res
         .status(401)
         .json({ status: 401, message: "email id not found" });
-    const new_otp = await send_otp(user.email);
+    const new_otp = await re_send_otp(user.email);
     if (!new_otp) return new Error("otp not send");
     return res.json({
       status: 200,
