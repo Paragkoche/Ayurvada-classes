@@ -276,9 +276,10 @@ const Page = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {_data.map((v: any) => (
-                  <T {...{ classes, v, setD, setSelectedName, setDialog }} />
-                ))}
+                {classes.length != 0 &&
+                  _data.map((v: any) => (
+                    <T {...{ classes, v, setD, setSelectedName, setDialog }} />
+                  ))}
               </TableBody>
             </Table>
           </TableContainer>

@@ -126,6 +126,7 @@ export default () => {
                             .put(URL + "/password", {
                               email: sessionStorage.getItem("email"),
                               password,
+                              otp,
                             })
                             .then(() => {
                               router.push("/login");

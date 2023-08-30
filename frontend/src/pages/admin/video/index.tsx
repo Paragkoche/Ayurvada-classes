@@ -158,7 +158,7 @@ const Page = () => {
                       <Typography flexWrap={"wrap"}>{v.disc}</Typography>
                     </TableCell>
                     <TableCell>
-                      <Typography flexWrap={"wrap"}>{URL + v.link}</Typography>
+                      <Typography flexWrap={"wrap"}>{v.link}</Typography>
                     </TableCell>
 
                     <TableCell>

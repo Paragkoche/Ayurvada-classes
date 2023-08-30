@@ -74,10 +74,7 @@ const Page = () => {
                     poster: data.data.photo,
                     sources: [
                       {
-                        src: `${URL}/${(data.data.link as string).replace(
-                          " ",
-                          ""
-                        )}`,
+                        src: data.data.link,
                         provider: "html5",
                       },
                     ],
