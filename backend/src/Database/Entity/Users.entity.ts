@@ -88,7 +88,7 @@ export class PayFor {
   @ManyToOne(() => User, (user) => user.payFor)
   user: User;
 
-  @OneToMany(() => Classes, (classes) => classes.payFor, {
+  @ManyToOne(() => Classes, (classes) => classes.payFor, {
     cascade: true,
     onDelete: "CASCADE",
   })
