@@ -331,11 +331,12 @@ export const delete_user_in_class = async (
 ) => {
   try {
     const { id } = req.body;
-    await PayForDB.delete(id);
+    const data = await PayForDB.delete(id);
 
     return res.json({
       status: 200,
-      data: "ok",
+      message: "ok",
+      data,
     });
   } catch (e) {
     return res.status(500).json({
