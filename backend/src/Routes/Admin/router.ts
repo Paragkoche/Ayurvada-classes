@@ -19,7 +19,11 @@ router.post("/add-class", AdminToken, Controller.Add_Class);
 router.post("/add-video-file", Controller.Add_Video);
 router.post("/add-video-data", Controller.Add_Video_db);
 router.put("/add-user-in-class", AdminToken, Controller.Add_user_in_class);
-router.put("/delete-user-in-class", AdminToken, Controller.Add_user_in_class);
+router.put(
+  "/delete-user-in-class",
+  AdminToken,
+  Controller.delete_user_in_class
+);
 router.put("/update-user", AdminToken, Controller.Add_update_user);
 router.put("/update-video", AdminToken, Controller.Add_update_video);
 router.put("/update-class", AdminToken, Controller.Add_update_class);
