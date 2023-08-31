@@ -119,6 +119,7 @@ const FirebaseLogin = ({ ...others }) => {
         }}
         onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
           console.log(values);
+          setSubmitting(true)
           StudentRegister({ ...values })
             .then(
               (e) => {

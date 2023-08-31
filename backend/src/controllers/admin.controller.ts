@@ -442,6 +442,11 @@ export const one_user = async (req: AdminTokenRequest, res: Response) => {
       data: await UserDb.findOne({
         where: { id: req.params.id },
         cache: true,
+        relations: {
+          payFor: {
+            class: true,
+          },
+        },
       }),
     });
   } catch (e) {

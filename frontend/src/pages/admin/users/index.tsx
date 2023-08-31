@@ -45,18 +45,17 @@ import {
 import { Typography } from "@mui/material";
 import { useTheme } from "@mui/material";
 import { IconButton, InputAdornment } from "@mui/material";
-import { useRouter } from "next/router";
+import { Router, useRouter } from "next/router";
 import React, { useState } from "react";
 import { Classes, Users, add_user_in_class, delete_user } from "@/api";
 import AnimateButton from "@/Components/extr/AnimateButton";
 import { MultiSelect } from "react-mui-multi-select";
+import { selectionSetMatchesResult } from "@apollo/client/cache/inmemory/helpers";
 export function applyPagination(
   documents: any,
   page: number,
   rowsPerPage: number
 ) {
-  console.log(documents);
-
   return documents.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 }
 const Page = () => {
@@ -140,19 +139,18 @@ const Page = () => {
                   value={name}
                   onChange={(e) => {
                     setName(e.target.value);
+
                     setData(
                       applyPagination(
                         e.target.value == ""
                           ? data
-                          : _data
+                          : data
                               .map((v: any) => {
                                 if (
                                   (v.name as string)
                                     .toLocaleLowerCase()
 
-                                    .includes(
-                                      e.target.value.toLocaleLowerCase()
-                                    )
+                                    .includes(name.toLocaleLowerCase())
                                 ) {
                                   return v;
                                 }
@@ -176,23 +174,19 @@ const Page = () => {
                   label="Class"
                   value={selectClass}
                   onChange={(e) => {
+                    let studentsForClass = [];
                     setSelectClass(e.target.value);
-                    console.log(data);
 
-                    if (selectClass == "All")
+                    if (e.target.value == "All")
                       setData(applyPagination(data || [], page, rowsPerPage));
                     else {
-                      const studentsForClass = [];
-
                       for (const student of data) {
                         const classInfo = student.payFor.find(
-                          (payment: any) => payment.class.name !== selectClass
+                          (payment: any) => payment.class.name == e.target.value
                         );
-                        if (classInfo) {
-                          console.log(classInfo);
 
+                        if (classInfo !== undefined)
                           studentsForClass.push(student);
-                        }
                       }
                       setData(
                         applyPagination(
@@ -204,8 +198,10 @@ const Page = () => {
                     }
                   }}
                 >
-                  {[{ name: "All" }, ...classes]?.map((v) => (
-                    <MenuItem value={v.name}>{v.name}</MenuItem>
+                  {[{ name: "All" }, ...classes]?.map((v: any, i) => (
+                    <MenuItem key={v?.id || i} value={v.name}>
+                      {v.name}
+                    </MenuItem>
                   ))}
                 </Select>
               </FormControl>
@@ -277,8 +273,13 @@ const Page = () => {
               </TableHead>
               <TableBody>
                 {classes.length != 0 &&
-                  _data.map((v: any) => (
-                    <T {...{ classes, v, setD, setSelectedName, setDialog }} />
+                  _data.map((v: any, i: any) => (
+                    <>
+                      <T
+                        myKey={v.id}
+                        {...{ classes, v, setD, setSelectedName, setDialog }}
+                      />
+                    </>
                   ))}
               </TableBody>
             </Table>
@@ -302,10 +303,10 @@ const Page = () => {
             <Button
               color="error"
               onClick={() => {
-                console.log(D);
-
                 if (D == "Delete") {
                   delete_user(seleteName.id);
+                } else if (D == "Access Classes") {
+                  router.push("/admin/users/add-class/" + seleteName.id);
                 } else {
                   router.push("/admin/users/update/" + seleteName.id);
                 }
@@ -320,17 +321,17 @@ const Page = () => {
     )
   );
 };
-const T = ({ classes, v, setD, setSelectedName, setDialog }: any) => {
+const T = ({ myKey, classes, v, setD, setSelectedName, setDialog }: any) => {
   const [PayFor, setPayFor] = useState<any>(v.payFor.map((v: any) => v.class));
   const [allClasses, setAllClasses] = useState(classes);
-
+  const router = useRouter();
   React.useEffect(() => {
     let ids = PayFor.map((v: any) => v.id);
     setAllClasses((s: any) => s.filter((v: any) => !ids.includes(v.id)));
   }, []);
 
   return (
-    <TableRow>
+    <TableRow key={myKey}>
       <TableCell>
         <Typography flexWrap={"wrap"}>{v.name}</Typography>
       </TableCell>
@@ -349,26 +350,36 @@ const T = ({ classes, v, setD, setSelectedName, setDialog }: any) => {
         <Checkbox disabled checked={v.is_active} />
       </TableCell>
       <TableCell>
-        <MultiSelect
+        {/* <MultiSelect
           getOptionLabel={(v: any) => {
             return v.name;
           }}
           getOptionKey={(v: any) => {
             return v.id;
           }}
+          key={Math.random()}
           options={allClasses}
           value={PayFor}
           onChange={function (value: any[]): void {
-            console.log(value);
-
             add_user_in_class({ classId: value.at(-1).id, userId: v.id }).then(
               ({ data }) => {
-                console.log(data.data);
                 setPayFor(value);
               }
             );
           }}
-        />
+        /> */}
+        <Button
+          onClick={() => {
+            setD("Access Classes");
+            setSelectedName({
+              id: v.id,
+              name: v.name,
+            });
+            setDialog((s: any) => !s);
+          }}
+        >
+          Access Class
+        </Button>
       </TableCell>
       <TableCell>
         <Button

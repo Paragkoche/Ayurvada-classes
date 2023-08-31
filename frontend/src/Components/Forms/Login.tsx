@@ -97,6 +97,7 @@ const FirebaseLogin = ({ ...others }) => {
           password: Yup.string().max(255).required("Password is required"),
         })}
         onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
+          setSubmitting(true);
           Login(values.email, values.password)
             .then(
               (e) => {
