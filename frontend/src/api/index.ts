@@ -107,6 +107,9 @@ export const add_video_data = (data: {}) => {
 export const add_user_in_class = (data: {}) => {
   return Token_admin_axios().put("/add-user-in-class", data);
 };
+export const delete_user_in_class = (data: any) => {
+  return Token_admin_axios().delete("/delete-user-in-class", data);
+};
 export const update_class = (data: {}) =>
   Token_admin_axios().put("/update-class", data);
 export const one_class = (id: string) =>

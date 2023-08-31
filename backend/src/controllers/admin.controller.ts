@@ -325,6 +325,25 @@ export const Add_user_in_class = async (
     });
   }
 };
+export const delete_user_in_class = async (
+  req: AdminTokenRequest,
+  res: Response
+) => {
+  try {
+    const { id } = req.body;
+    PayForDB.delete(id);
+
+    return res.json({
+      status: 200,
+      data: "ok",
+    });
+  } catch (e) {
+    return res.status(500).json({
+      status: 500,
+      message: "Internal server error",
+    });
+  }
+};
 export const Add_update_user = async (
   req: AdminTokenRequest,
   res: Response

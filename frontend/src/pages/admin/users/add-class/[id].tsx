@@ -1,7 +1,12 @@
 import { useRouter } from "next/router";
 import Layout from "../../Layout";
 import React from "react";
-import { Classes, one_user } from "@/api";
+import {
+  Classes,
+  add_user_in_class,
+  delete_user_in_class,
+  one_user,
+} from "@/api";
 import {
   CircularProgress,
   Table,
@@ -95,10 +100,31 @@ const Page = () => {
                 </TableCell>
                 <TableCell>
                   <Checkbox
-                    checked={
-                      userData.payFor.filter((v: any) => v.class.id == v.id)
-                        .length == 1
-                    }
+                    checked={userData.payFor
+                      .map((c: any) => c.class.id)
+                      .includes(v.id)}
+                    onChange={(e) => {
+                      console.log(e.target.value);
+
+                      if (e.target.checked) {
+                        add_user_in_class({
+                          classId: v.id,
+                          userId: userData.id,
+                        }).then(() => {
+                          alert("User Access to " + v.name);
+                          router.reload();
+                        });
+                      } else {
+                        const data = userData.payFor
+                          .filter((c: any) => c.class.id == v.id)
+                          .map((v: any) => v.id);
+                        for (let d of data) {
+                          console.log(d);
+
+                          delete_user_in_class({ id: d });
+                        }
+                      }
+                    }}
                   />
                 </TableCell>
               </TableRow>
