@@ -331,7 +331,7 @@ export const delete_user_in_class = async (
 ) => {
   try {
     const { id } = req.body;
-    PayForDB.delete(id);
+    await PayForDB.delete(id);
 
     return res.json({
       status: 200,

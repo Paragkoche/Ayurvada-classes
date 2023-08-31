@@ -123,6 +123,7 @@ const Page = () => {
 
                           delete_user_in_class({ id: d });
                         }
+                        // router.reload();
                       }
                     }}
                   />
