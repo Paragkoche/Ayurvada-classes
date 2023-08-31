@@ -59,8 +59,8 @@ export function applyPagination(
   return documents.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 }
 const Page = () => {
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  // const [page, setPage] = React.useState(0);
+  // const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
   const theme = useTheme();
   const router = useRouter();
@@ -84,20 +84,18 @@ const Page = () => {
       });
   }, []);
 
-  const [_data, setData] = React.useState(
-    applyPagination(data || [], page, rowsPerPage)
-  );
+  const [_data, setData] = React.useState(data);
   React.useEffect(() => {
-    return setData(applyPagination(data || [], page, rowsPerPage));
-  }, [page, rowsPerPage, data]);
+    return setData(data || []);
+  }, [data]);
 
-  const handlePageChange = React.useCallback((event: any, value: any) => {
-    setPage(value);
-  }, []);
+  // const handlePageChange = React.useCallback((event: any, value: any) => {
+  //   setPage(value);
+  // }, []);
 
-  const handleRowsPerPageChange = React.useCallback((event: any) => {
-    setRowsPerPage(event.target.value);
-  }, []);
+  // const handleRowsPerPageChange = React.useCallback((event: any) => {
+  //   setRowsPerPage(event.target.value);
+  // }, []);
   const [selectClass, setSelectClass] = useState("All");
   const [name, setName] = useState("");
   return (
@@ -141,24 +139,20 @@ const Page = () => {
                     setName(e.target.value);
 
                     setData(
-                      applyPagination(
-                        e.target.value == ""
-                          ? data
-                          : data
-                              .map((v: any) => {
-                                if (
-                                  (v.name as string)
-                                    .toLocaleLowerCase()
+                      e.target.value == ""
+                        ? data
+                        : _data
+                            .map((v: any) => {
+                              if (
+                                (v.name as string)
+                                  .toLocaleLowerCase()
 
-                                    .includes(name.toLocaleLowerCase())
-                                ) {
-                                  return v;
-                                }
-                              })
-                              .filter((v: any) => v != undefined) || [],
-                        page,
-                        rowsPerPage
-                      )
+                                  .includes(name.toLocaleLowerCase())
+                              ) {
+                                return v;
+                              }
+                            })
+                            .filter((v: any) => v != undefined) || []
                     );
                   }}
                   placeholder="Name of Student"
@@ -177,8 +171,7 @@ const Page = () => {
                     let studentsForClass = [];
                     setSelectClass(e.target.value);
 
-                    if (e.target.value == "All")
-                      setData(applyPagination(data || [], page, rowsPerPage));
+                    if (e.target.value == "All") setData(data || []);
                     else {
                       for (const student of data) {
                         const classInfo = student.payFor.find(
@@ -188,13 +181,7 @@ const Page = () => {
                         if (classInfo !== undefined)
                           studentsForClass.push(student);
                       }
-                      setData(
-                        applyPagination(
-                          studentsForClass || [],
-                          page,
-                          rowsPerPage
-                        )
-                      );
+                      setData(studentsForClass || []);
                     }
                   }}
                 >
@@ -284,7 +271,7 @@ const Page = () => {
               </TableBody>
             </Table>
           </TableContainer>
-          <TablePagination
+          {/* <TablePagination
             component="div"
             count={data.length}
             onPageChange={handlePageChange}
@@ -292,7 +279,7 @@ const Page = () => {
             page={page}
             rowsPerPage={rowsPerPage}
             rowsPerPageOptions={[5, 10, 25]}
-          />
+          /> */}
         </MainCard>
         <Dialog open={dialog}>
           <DialogTitle>Do you want to {D} this student?</DialogTitle>

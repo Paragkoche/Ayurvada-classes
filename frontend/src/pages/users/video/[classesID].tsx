@@ -1,5 +1,6 @@
 import {
   Box,
+  Button,
   Card,
   CardActions,
   CardContent,
@@ -39,7 +40,7 @@ const Page = () => {
         .finally(() => setLoading(false));
   }, [classesID]);
   console.log(data);
-
+  const route = useRouter();
   return (
     <>
       {loading && !data ? (
@@ -55,12 +56,14 @@ const Page = () => {
                     <Typography>{v.title}</Typography>
                   </CardContent>
                   <CardActions>
-                    <Link href={"/users/video/view/" + v.id}>
+                    <Button
+                      onClick={() => router.push("/users/video/view/" + v.id)}
+                    >
                       watch video{" "}
                       {v.isLiveNow ? (
                         <Typography color="red">Live</Typography>
                       ) : null}
-                    </Link>
+                    </Button>
                   </CardActions>
                 </Card>
               ))}

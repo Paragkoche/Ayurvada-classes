@@ -112,7 +112,13 @@ const Page = () => {
                           userId: userData.id,
                         }).then(() => {
                           alert("User Access to " + v.name);
-                          router.reload();
+                          if (id)
+                            one_user(id).then((data) => {
+                              setUserData(data.data.data);
+                              Classes().then(({ data }) => {
+                                setClasses(data.data);
+                              });
+                            });
                         });
                       } else {
                         const data = userData.payFor
@@ -123,7 +129,13 @@ const Page = () => {
 
                           delete_user_in_class({ id: d });
                         }
-                        router.reload();
+                        if (id)
+                          one_user(id).then((data) => {
+                            setUserData(data.data.data);
+                            Classes().then(({ data }) => {
+                              setClasses(data.data);
+                            });
+                          });
                       }
                     }}
                   />

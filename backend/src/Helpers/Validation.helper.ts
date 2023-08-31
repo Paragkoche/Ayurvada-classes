@@ -3,7 +3,7 @@ import { NextFunction, Request, Response } from "express";
 import db from "@/Database";
 import { User } from "@/Database/Entity/Users.entity";
 import { password_hash } from "./Password.helper";
-let password_regx = /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,16}$/;
+// let password_regx = /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,16}$/;
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 const userDB = db.getRepository(User);
 
@@ -38,12 +38,12 @@ export const UserRegistration = async (
         message: "gender must be female, male, or other",
       });
 
-    if (data.password.length <= 8 || !password_regx.test(data.password))
-      return res.status(400).json({
-        status: 400,
-        message:
-          "Password must be at least 8 characters long or include special characters.",
-      });
+    // if (data.password.length <= 8 || !password_regx.test(data.password))
+    //   return res.status(400).json({
+    //     status: 400,
+    //     message:
+    //       "Password must be at least 8 characters long or include special characters.",
+    //   });
 
     if (!emailRegex.test(data.email))
       return res.status(400).json({
