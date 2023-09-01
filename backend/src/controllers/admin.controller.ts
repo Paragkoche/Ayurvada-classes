@@ -363,6 +363,7 @@ export const Add_update_user = async (
     return res.status(500).json({
       status: 500,
       message: "Internal server error",
+      error: e,
     });
   }
 };
