@@ -360,10 +360,12 @@ export const Add_update_user = async (
       data: await UserDb.findOne({ where: { id: data.userId } }),
     });
   } catch (e) {
+    console.log(e);
+
     return res.status(500).json({
       status: 500,
       message: "Internal server error",
-      error: e,
+      error: e.toString(),
     });
   }
 };
