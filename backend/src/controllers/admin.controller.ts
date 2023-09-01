@@ -359,7 +359,7 @@ export const Add_update_user = async (
     if (!update_user) return new Error("User not Update");
     return res.json({
       status: 200,
-      data: await UserDb.findOne({ where: { id: data.userId } }),
+      data: await UserDb.findOne({ where: { id } }),
     });
   } catch (e) {
     console.log(e);
