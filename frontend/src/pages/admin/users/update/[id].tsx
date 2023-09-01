@@ -41,7 +41,7 @@ const update = () => {
         one_user(id).then(({ data }) => {
           console.log(data);
 
-          setData(data.data);
+          setData({ ...data.data, password: undefined });
         });
     } catch (e) {
       console.log(e);
@@ -161,9 +161,20 @@ const update = () => {
                           onSubmit={(e) => {
                             e.preventDefault();
                             setisSubmitting(true);
-                            update_user(data, id)
+                            update_user(
+                              {
+                                name: data.name,
+                                password: data.password,
+                                age: data.age,
+                                gender: data.gender,
+                              },
+                              id
+                            )
                               .then(() => {
                                 route.push("/admin/users");
+                              })
+                              .catch((e) => {
+                                alert(e.response.data.message);
                               })
                               .finally(() => {
                                 setisSubmitting(false);
@@ -216,7 +227,7 @@ const update = () => {
                                   password: e.target.value,
                                 }));
                               }}
-                              value={data.password}
+                              value={data.password ? data.password : ""}
                             />
                           </FormControl>
 

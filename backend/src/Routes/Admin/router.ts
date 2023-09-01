@@ -1,7 +1,11 @@
 import { Router } from "express";
 import { AdminToken } from "@/Helpers/Token.helper";
 import * as Controller from "@/controllers/admin.controller";
-import { ClassesAdd, UserRegistration } from "@/Helpers/Validation.helper";
+import {
+  ClassesAdd,
+  UserRegistration,
+  update_user,
+} from "@/Helpers/Validation.helper";
 const router = Router();
 
 router.get("/home", AdminToken, Controller.Home);
@@ -24,7 +28,7 @@ router.put(
   AdminToken,
   Controller.delete_user_in_class
 );
-router.put("/update-user", AdminToken, Controller.Add_update_user);
+router.put("/update-user", AdminToken, update_user, Controller.Add_update_user);
 router.put("/update-video", AdminToken, Controller.Add_update_video);
 router.put("/update-class", AdminToken, Controller.Add_update_class);
 

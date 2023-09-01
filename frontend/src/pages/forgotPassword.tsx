@@ -130,7 +130,7 @@ export default () => {
                                 router.push("/password");
                               },
                               (e) => {
-                                alert(e.message);
+                                alert(e.response.data.message);
                               }
                             )
                             .finally(() => {

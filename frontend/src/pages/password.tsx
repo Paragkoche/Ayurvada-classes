@@ -131,7 +131,7 @@ export default () => {
                             .then(() => {
                               router.push("/login");
                             })
-                            .catch((e) => alert(e.message))
+                            .catch((e) => alert(e.response.data.message))
                             .finally(() => {
                               setDis(false);
                             });

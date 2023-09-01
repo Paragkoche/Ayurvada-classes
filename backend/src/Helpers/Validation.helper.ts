@@ -141,8 +141,8 @@ export const update_user = async (
   next: NextFunction
 ) => {
   try {
-    const { password } = req.body;
-    req.body.password = await password_hash(password);
+    const data = req.body;
+    if (data.password) req.body.password = await password_hash(data.password);
     next();
   } catch (e) {
     return res.status(500).json({
