@@ -351,7 +351,9 @@ export const Add_update_user = async (
 ) => {
   try {
     const data = req.body;
-    const update_user = await UserDb.update(data.userId, {
+    const id = data.userId;
+    data.userId = undefined;
+    const update_user = await UserDb.update(id, {
       ...data,
     });
     if (!update_user) return new Error("User not Update");
