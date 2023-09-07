@@ -22,7 +22,7 @@ services:
       PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION: "True"
       PGADMIN_CONFIG_LOGIN_BANNER: "Authorised users only!"
       PGADMIN_CONFIG_CONSOLE_LOG_LEVEL: "10"
-    container_name: pgadmin4\
+    container_name: pgadmin4
     networks:
       - mynetwork
 networks:
