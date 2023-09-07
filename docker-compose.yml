@@ -17,10 +17,8 @@ services:
     ports:
       - "443:443"
     environment:
-      PGADMIN_DEFAULT_EMAIL: user@domain.com
-      PGADMIN_DEFAULT_PASSWORD: SuperSecret
-      PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION: "True"
-      PGADMIN_CONFIG_LOGIN_BANNER: "Authorised users only!"
+      PGADMIN_DEFAULT_EMAIL: "addmin@gmail.com"
+      PGADMIN_DEFAULT_PASSWORD: "koche3588"
       PGADMIN_CONFIG_CONSOLE_LOG_LEVEL: "10"
     container_name: pgadmin4
     networks:
