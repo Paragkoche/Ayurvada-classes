@@ -15,7 +15,7 @@ services:
   pgadmin:
     image: dpage/pgadmin4
     ports:
-      - "8070:80"
+      - "443:443"
     environment:
       PGADMIN_DEFAULT_EMAIL: user@domain.com
       PGADMIN_DEFAULT_PASSWORD: SuperSecret
