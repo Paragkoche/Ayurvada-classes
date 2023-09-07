@@ -1,44 +1,18 @@
 version: "3.8"
 services:
   db:
-    image: postgres:14.1-alpine
+    image: postgres:latest
     restart: always
     environment:
       - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_PASSWORD=970bc93e3a88d5e48e511be31ae86f7f6684a9c8774d2aaa206ac046d692eb6b72b25098dbf8394e55ba65fe46b0ebfbace8
     ports:
-      - "80:8085"
+      - "5432:5432"
     volumes:
       - db:/var/lib/postgresql/data
     networks:
       - mynetwork
-  api:
-    container_name: API
-    restart: always
-    build:
-      context: backend-new/
-      dockerfile: Dockerfile
-    command: /bin/bash -c "rm -r ./node_modules/;npx prisma db push;npm i && npm i ts-node -g && npm i nodemon -g && npm run dev"
-    working_dir: /backend
-    ports:
-      - 2053:2053
-    volumes:
-      - ./backend-new:/backend
-    networks:
-      - mynetwork
-  # nextjs:
-  #   container_name: nextjs
-  #   build:
-  #     context: frontend
-  #     dockerfile: Dockerfile
-  #   command: /bin/bash -c "npm run build && npm run start"
-  #   volumes:
-  #     - ./frontend:/frontend
-  #   ports:
-  #     - "80:80"
-  #   depends_on:
-  #     - api
-  #     - db
+
 networks:
   mynetwork:
     driver: bridge
