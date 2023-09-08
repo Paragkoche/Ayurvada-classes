@@ -1,6 +1,6 @@
 import axios, { AxiosProgressEvent } from "axios";
 
-export const URL = "https://api.tanwishlife.com/v1";
+export const URL = "https://api.tanwishlife.com/api/v1";
 
 const student_route = `${URL}/student`;
 const admin_route = `${URL}/admin`;

@@ -259,15 +259,14 @@ const Page = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {classes.length != 0 &&
-                  _data.map((v: any, i: any) => (
-                    <>
-                      <T
-                        myKey={v.id}
-                        {...{ classes, v, setD, setSelectedName, setDialog }}
-                      />
-                    </>
-                  ))}
+                {_data.map((v: any, i: any) => (
+                  <>
+                    <T
+                      myKey={v.id}
+                      {...{ classes, v, setD, setSelectedName, setDialog }}
+                    />
+                  </>
+                ))}
               </TableBody>
             </Table>
           </TableContainer>

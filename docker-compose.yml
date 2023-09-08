@@ -1,5 +1,18 @@
 version: "3.8"
 services:
+  bakend:
+    image: node:latest
+    restart: always
+    ports:
+      - "8081:8081"
+    build: ./backend
+    command: "npm run dev"
+    volumes:
+      - .:/home/app
+    depends_on:
+      - db
+    networks:
+      - mynetwork
   db:
     image: postgres:latest
     restart: always
@@ -29,4 +42,6 @@ networks:
     driver: bridge
 volumes:
   db:
+    driver: local
+  bakend:
     driver: local
